@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Builder $21M Targeting Agent &mdash; Plan Evaluation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; background: #fff; line-height: 1.4; padding: 24px 32px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 16pt; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 12pt; font-weight: 700; margin-bottom: 8px; margin-top: 24px; border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+  h3 { font-size: 10pt; font-weight: 700; margin-bottom: 6px; margin-top: 12px; }
+  p { margin-bottom: 8px; }
+  .subtitle { font-size: 10pt; color: #555; font-style: italic; margin-bottom: 16px; }
+  .page-label { font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+
+  .nav { margin-bottom: 16px; padding: 8px 0; border-bottom: 2px solid #1a3a5c; }
+  .nav a { font-size: 9pt; font-weight: 700; color: #1a3a5c; text-decoration: none; margin-right: 20px; }
+  .nav a.active { border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+
+  .vision-box { background: #f5f5f5; border-left: 4px solid #1a3a5c; padding: 12px 16px; margin: 12px 0 16px 0; }
+  .vision-box p { font-size: 10pt; line-height: 1.55; margin-bottom: 0; }
+
+  .summary-bar { display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap; }
+  .summary-card { flex: 1; min-width: 140px; border: 2px solid #1a3a5c; padding: 12px; text-align: center; }
+  .summary-card .num { font-size: 18pt; font-weight: 700; color: #1a3a5c; }
+  .summary-card .label { font-size: 8pt; color: #555; margin-top: 2px; }
+
+  .verdict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .verdict-card { border: 1px solid #d1d5db; padding: 12px; }
+  .verdict-card h3 { margin-top: 0; font-size: 10pt; color: #1a3a5c; }
+  .verdict-card.good { border-left: 4px solid #166534; background: #f0fdf4; }
+  .verdict-card.risk { border-left: 4px solid #B91C1C; background: #FEF2F2; }
+
+  ul { margin: 6px 0 6px 20px; }
+  ul li { margin-bottom: 4px; line-height: 1.45; }
+
+  .callout { background: #FEF3C7; border: 1px solid #F59E0B; padding: 10px 14px; margin: 12px 0; font-size: 9pt; }
+  .callout strong { color: #92400E; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 8px 0; }
+  th, td { border: 1px solid #bfbfbf; padding: 6px 10px; vertical-align: top; text-align: left; }
+  th { background: #1a3a5c; color: #fff; font-weight: 700; }
+  .high { background: #FEE2E2; font-weight: 700; }
+
+  .note { font-size: 8pt; color: #888; margin-top: 8px; }
+
+  @media print { body { padding: 12px; font-size: 7.5pt; } }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html" class="active">Overview</a>
+  <a href="evaluation.html">Evaluation</a>
+  <a href="improvements.html">Phase-by-Phase Improvements</a>
+  <a href="github-repos.html">GitHub Repos</a>
+  <a href="reliability-path.html">12-Week Reliability Path</a>
+</div>
+
+<div class="page-label">Mailchimp Builder $21M Targeting Agent</div>
+<h1>Plan Evaluation &amp; High-Probability Path to Success</h1>
+<p class="subtitle">An independent review of the Builder $21M Targeting Agent plan with critical gaps, curated open-source recommendations, and a 12-week execution sequence designed to maximize the probability of hitting the $21M target.</p>
+
+<div class="vision-box">
+  <p><strong>Headline:</strong> The original plan is structurally sound &mdash; it correctly separates clustering (discovery) from prioritization (expected value), uses time-based validation, and includes uplift modeling. However, it has five high-impact gaps that, if left unaddressed, will make the $21M projection indefensible to a data science / finance review board. This site identifies those gaps, recommends 15 curated open-source repos to close them, and lays out a 12-week sequence that turns the plan from "ambitious analytical project" into "high-probability $21M business case."</p>
+</div>
+
+<h2>What This Site Contains</h2>
+
+<div class="verdict-grid">
+  <div class="verdict-card">
+    <h3><a href="evaluation.html">Evaluation</a></h3>
+    <p>Detailed critique of the plan: 6 strengths to preserve, 15 critical gaps, and the top 5 highest-impact fixes that move the needle most on $21M defensibility.</p>
+  </div>
+  <div class="verdict-card">
+    <h3><a href="improvements.html">Phase-by-Phase Improvements</a></h3>
+    <p>For each of the 19 phases in the original plan, what to add, what to change, and what to remove. Includes specific formulas (confidence discount, EV with overlap handling), code snippets, and validation rules.</p>
+  </div>
+  <div class="verdict-card">
+    <h3><a href="github-repos.html">GitHub Repo Catalog</a></h3>
+    <p>15 curated open-source repos organized by phase. Each entry includes why it matters, how to integrate, maturity / production-readiness, and what risk it mitigates.</p>
+  </div>
+  <div class="verdict-card">
+    <h3><a href="reliability-path.html">12-Week Reliability Path</a></h3>
+    <p>Week-by-week execution sequence with explicit data gates between phases. Designed so that if any gate fails, you stop and address the issue rather than carrying broken assumptions forward.</p>
+  </div>
+</div>
+
+<h2>Top 5 Highest-Impact Fixes (Executive View)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:25%;">Fix</th>
+      <th style="width:35%;">Problem It Solves</th>
+      <th style="width:25%;">Open-Source Tool</th>
+      <th style="width:15%;">Impact on $21M</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Survival-based CLV</strong></td>
+      <td>Phase 9 hardcodes <code>12 &times; MRR</code> for retention value. Real customers churn at different rates by segment. A 50% retention curve at month 12 means the true value is closer to 7-8 &times; MRR, not 12. This is the single largest source of revenue inflation in the plan.</td>
+      <td><code>lifelines</code><br><code>scikit-survival</code></td>
+      <td class="high">Could swing $5-8M</td>
+    </tr>
+    <tr>
+      <td><strong>2. MLflow + Great Expectations</strong></td>
+      <td>The plan has no experiment tracking, no data validation framework, and no feature lineage. Without these, the work cannot be reproduced by data science, validated by finance, or trusted by engineering review.</td>
+      <td><code>mlflow</code><br><code>great-expectations</code></td>
+      <td class="high">Defensibility</td>
+    </tr>
+    <tr>
+      <td><strong>3. Define confidence discount math</strong></td>
+      <td>The Phase 10 EV formula includes <code>confidence_discount</code> as a multiplier but never defines how it's calculated. Without an explicit formula tied to sample size, treatment evidence, and model calibration, EV numbers can't be defended in executive review.</td>
+      <td>Custom formula (see <a href="improvements.html">Improvements</a>)</td>
+      <td class="high">Credibility</td>
+    </tr>
+    <tr>
+      <td><strong>4. Monte Carlo on $21M waterfall</strong></td>
+      <td>The Phase 12 waterfall produces a single point estimate. Executives need to know: what's the P10 / P50 / P90 outcome? Is $21M the median or the optimistic case? Monte Carlo simulation answers this with a confidence band.</td>
+      <td><code>numpy</code> + <code>scipy.stats</code></td>
+      <td class="high">Risk framing</td>
+    </tr>
+    <tr>
+      <td><strong>5. Customer overlap in sequencing</strong></td>
+      <td>Phase 11 sequences initiatives but doesn't address the case where customer X is the best target for both initiative A (Wave 1) and B (Wave 2). Without <code>argmax(EV)</code> per customer, the same customer's revenue gets counted twice across waves.</td>
+      <td><code>PuLP</code> or <code>cvxpy</code> with assignment constraint</td>
+      <td class="high">Could overstate $21M by 15-25%</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Strengths to Preserve</h2>
+
+<p>Before fixing what's broken, the plan does six things right that should be carried into v2:</p>
+
+<ul>
+  <li><strong>Clustering as discovery, not prioritization.</strong> The plan explicitly warns against using cluster membership as the targeting answer. Final ranking comes from expected value, not cluster ID. This is correct and uncommon.</li>
+  <li><strong>Time-based train/test splits.</strong> The plan rejects random splits as the main validation approach. Train on months 1-6, score at end of month 6, measure outcomes in months 7-9. This prevents leakage from future-to-past correlation.</li>
+  <li><strong>Uplift modeling alongside propensity.</strong> The plan correctly distinguishes "who is likely to convert" (propensity) from "who would not have converted without intervention" (uplift). High-propensity customers may convert anyway.</li>
+  <li><strong>Estimate quality labels.</strong> Every estimate must be labeled as Validated, Directionally Supported, Assumption Based, or Insufficient Data. This is exactly the kind of intellectual honesty that survives finance scrutiny.</li>
+  <li><strong>Privacy guardrails.</strong> Hashed customer IDs only. No PII in outputs. This protects the work from compliance issues later.</li>
+  <li><strong>Reason codes for every recommendation.</strong> Every targeting decision must come with plain-English explanation. This is what makes the work usable by GTM, CSM, and sales teams.</li>
+</ul>
+
+<div class="callout">
+  <strong>Bottom Line:</strong> The plan's analytical philosophy is right. The execution details have gaps that need to be filled before the $21M number can be defended. The improvements in this site are additive &mdash; they don't replace the plan's structure, they fill in the missing math, tooling, and validation that turn a smart analytical approach into a trustworthy business case.
+</div>
+
+<h2>How to Navigate This Site</h2>
+
+<ol style="margin-left: 20px; margin-bottom: 12px;">
+  <li style="margin-bottom: 6px;">Start with the <a href="evaluation.html">Evaluation</a> to understand what's strong and what's missing.</li>
+  <li style="margin-bottom: 6px;">Review the <a href="improvements.html">Phase-by-Phase Improvements</a> to see specific changes for each of the 19 phases in your plan.</li>
+  <li style="margin-bottom: 6px;">Use the <a href="github-repos.html">GitHub Repo Catalog</a> to pick tools that fill the gaps without inventing new infrastructure.</li>
+  <li style="margin-bottom: 6px;">Execute against the <a href="reliability-path.html">12-Week Reliability Path</a> with hard data gates between phases.</li>
+</ol>
+
+<p class="note">Generated as an independent evaluation of the Builder $21M Targeting Agent plan. All recommendations are additive to the existing plan structure. No claims to the $21M outcome are made &mdash; the goal is to make the projection defensible with confidence intervals.</p>
+
+</body>
+</html>

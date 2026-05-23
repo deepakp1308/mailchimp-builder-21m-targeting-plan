@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Repo Catalog &mdash; Curated Open-Source Tools</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; background: #fff; line-height: 1.4; padding: 24px 32px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 16pt; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 12pt; font-weight: 700; margin-bottom: 8px; margin-top: 24px; border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+  h3 { font-size: 10pt; font-weight: 700; margin-bottom: 6px; margin-top: 12px; color: #1a3a5c; }
+  p { margin-bottom: 8px; }
+  .subtitle { font-size: 10pt; color: #555; font-style: italic; margin-bottom: 16px; }
+
+  .nav { margin-bottom: 16px; padding: 8px 0; border-bottom: 2px solid #1a3a5c; }
+  .nav a { font-size: 9pt; font-weight: 700; color: #1a3a5c; text-decoration: none; margin-right: 20px; }
+  .nav a.active { border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+
+  .repo { border: 1px solid #d1d5db; padding: 12px 16px; margin: 12px 0; background: #fafafa; }
+  .repo h3 { margin-top: 0; }
+  .repo .meta { font-size: 8pt; color: #555; margin-bottom: 8px; }
+  .repo a { color: #1a3a5c; font-weight: 700; }
+
+  .tag { display: inline-block; font-size: 7pt; font-weight: 700; padding: 2px 6px; border-radius: 2px; margin-left: 4px; vertical-align: middle; letter-spacing: 0.03em; text-transform: uppercase; }
+  .tag-prod { background: #166534; color: #fff; }
+  .tag-stable { background: #1E40AF; color: #fff; }
+  .tag-emerging { background: #92400E; color: #fff; }
+  .tag-impact-high { background: #B91C1C; color: #fff; }
+  .tag-impact-med { background: #92400E; color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 8px 0 16px 0; }
+  th, td { border: 1px solid #bfbfbf; padding: 6px 10px; vertical-align: top; text-align: left; }
+  th { background: #1a3a5c; color: #fff; font-weight: 700; }
+
+  code { font-family: Consolas, monospace; background: #f5f5f5; padding: 1px 4px; border-radius: 2px; font-size: 8.5pt; }
+
+  .callout { background: #FEF3C7; border: 1px solid #F59E0B; padding: 10px 14px; margin: 12px 0; font-size: 9pt; }
+
+  @media print { body { padding: 12px; font-size: 7.5pt; } }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html">Overview</a>
+  <a href="evaluation.html">Evaluation</a>
+  <a href="improvements.html">Phase-by-Phase Improvements</a>
+  <a href="github-repos.html" class="active">GitHub Repos</a>
+  <a href="reliability-path.html">12-Week Reliability Path</a>
+</div>
+
+<h1>GitHub Repo Catalog: 15 Curated Open-Source Tools</h1>
+<p class="subtitle">High-confidence, production-maturity recommendations to close the gaps identified in the plan evaluation. Every repo here is widely used, actively maintained, and integrates cleanly with the existing Python/BigQuery stack. No experimental repos.</p>
+
+<div class="callout">
+  <strong>Selection criteria:</strong> Each repo had to meet four bars: (1) actively maintained in 2025-2026, (2) production-tested at scale (used by Microsoft, Uber, Google, or large open-source community), (3) integrates with Pandas/scikit-learn/BigQuery, (4) clear documentation and examples. Experimental, single-author, or research-only repos were excluded.
+</div>
+
+<h2>Summary Table</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Repo</th>
+      <th>Phase Mapping</th>
+      <th>Closes Gap</th>
+      <th style="width:80px;">Impact</th>
+      <th style="width:80px;">Maturity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>mlflow/mlflow</td><td>Phase -1, 0, 17</td><td>No experiment tracking</td><td><span class="tag tag-impact-high">High</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>2</td><td>great-expectations/great_expectations</td><td>Phase -1, 1, 3, 18</td><td>No data validation framework</td><td><span class="tag tag-impact-high">High</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>3</td><td>feast-dev/feast</td><td>Phase 3</td><td>No feature store / lineage</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>4</td><td>evidentlyai/evidently</td><td>Phase 17 (post-deploy)</td><td>No drift monitoring</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>5</td><td>CamDavidsonPilon/lifelines</td><td>Phase 9</td><td>Hardcoded 12&times;MRR</td><td><span class="tag tag-impact-high">High</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>6</td><td>sebp/scikit-survival</td><td>Phase 9</td><td>Need feature-conditional survival</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+    <tr><td>7</td><td>optuna/optuna</td><td>Phase 7</td><td>No HPO framework</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>8</td><td>interpretml/interpret</td><td>Phase 7</td><td>Glass-box alternative to LightGBM</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+    <tr><td>9</td><td>maks-sh/scikit-uplift</td><td>Phase 8</td><td>Simpler uplift API + viz</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+    <tr><td>10</td><td>DoubleML/doubleml-for-py</td><td>Phase 8</td><td>Honest CATE inference</td><td><span class="tag tag-impact-high">High</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+    <tr><td>11</td><td>interpretml/DiCE</td><td>Phase 13</td><td>Counterfactual explanations</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+    <tr><td>12</td><td>fairlearn/fairlearn</td><td>Phase 15</td><td>No fairness audit</td><td><span class="tag tag-impact-high">High</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>13</td><td>cvxpy/cvxpy</td><td>Phase 11</td><td>Non-linear sequencing constraints</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-prod">Prod</span></td></tr>
+    <tr><td>14</td><td>GoogleCloudPlatform/marketing-analytics-jumpstart</td><td>Reference</td><td>GCP marketing pipeline architecture</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+    <tr><td>15</td><td>microsoft/MLOpsPython</td><td>Reference</td><td>MLOps reference patterns</td><td><span class="tag tag-impact-med">Med</span></td><td><span class="tag tag-stable">Stable</span></td></tr>
+  </tbody>
+</table>
+
+<h2>MLOps Foundation (Repos 1-4)</h2>
+
+<div class="repo">
+  <h3>1. mlflow/mlflow <span class="tag tag-prod">Production</span> <span class="tag tag-impact-high">High Impact</span></h3>
+  <div class="meta"><a href="https://github.com/mlflow/mlflow" target="_blank">github.com/mlflow/mlflow</a> &middot; 19K+ stars &middot; Maintained by Databricks &middot; Used at scale by Microsoft, Booking.com, Toyota</div>
+  <p><strong>What it does:</strong> Experiment tracking, model registry, model serving. Logs every model training run with hyperparameters, metrics, artifacts, and source code commit hash.</p>
+  <p><strong>Why you need it:</strong> The plan trains 10+ models across multiple validation windows. Without MLflow, you cannot answer "which run produced this score?" or "can we reproduce yesterday's result?" Data science review will reject any work that lacks experiment tracking.</p>
+  <p><strong>Integration:</strong> Two-line setup. Wrap every <code>fit()</code> call with <code>with mlflow.start_run():</code>. Logs to local SQLite by default; can be switched to BigQuery-backed for team use.</p>
+  <p><strong>Risk it mitigates:</strong> Reproducibility. Audit trail. Model versioning.</p>
+</div>
+
+<div class="repo">
+  <h3>2. great-expectations/great_expectations <span class="tag tag-prod">Production</span> <span class="tag tag-impact-high">High Impact</span></h3>
+  <div class="meta"><a href="https://github.com/great-expectations/great_expectations" target="_blank">github.com/great-expectations/great_expectations</a> &middot; 10K+ stars &middot; Maintained by GX Cloud &middot; Used by Heineken, ING, Vimeo</div>
+  <p><strong>What it does:</strong> Data validation framework. Define expectations ("<code>current_mrr</code> is non-null and &gt; 0", "row count is within 5% of yesterday") as code. Run as part of the pipeline. Fail fast on violations.</p>
+  <p><strong>Why you need it:</strong> The plan reads from 30+ BigQuery tables. If a column changes type, a feed breaks, or a value distribution shifts, the pipeline silently continues with broken assumptions. GX catches this at the data layer before models train on bad input.</p>
+  <p><strong>Integration:</strong> Define a "checkpoint" per data source. Run as the first step of each <code>src/*.py</code> script. Failures halt the pipeline and produce a diagnostic report.</p>
+  <p><strong>Risk it mitigates:</strong> Silent data corruption. Models trained on bad data. Downstream errors that look like model bugs.</p>
+</div>
+
+<div class="repo">
+  <h3>3. feast-dev/feast <span class="tag tag-prod">Production</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/feast-dev/feast" target="_blank">github.com/feast-dev/feast</a> &middot; 5.7K+ stars &middot; Originally Gojek/Google &middot; Used by Robinhood, Twitter, Discord</div>
+  <p><strong>What it does:</strong> Open-source feature store. Defines features as code, versions them, serves them consistently between training and inference. BigQuery offline store + Redis online store is the common pattern.</p>
+  <p><strong>Why you need it:</strong> Features in Phase 3 are computed in BigQuery but not versioned. If "30-day Builder sessions" changes definition mid-project, you can't compare today's scores to yesterday's. Feast (or even a YAML + hash approach) prevents this.</p>
+  <p><strong>Integration:</strong> Higher overhead than the others. If team is small, start with a hash-of-SQL approach in <code>feature_definitions.yaml</code>. Adopt Feast when scaling to multiple model consumers.</p>
+  <p><strong>Risk it mitigates:</strong> Feature drift between training and scoring. Inability to reproduce historical features.</p>
+</div>
+
+<div class="repo">
+  <h3>4. evidentlyai/evidently <span class="tag tag-prod">Production</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/evidentlyai/evidently" target="_blank">github.com/evidentlyai/evidently</a> &middot; 5K+ stars &middot; Maintained by Evidently AI &middot; Used by Hyatt, Toyota Research</div>
+  <p><strong>What it does:</strong> Model and data drift monitoring. Compares production data distributions to training distributions; flags feature drift, prediction drift, and target drift.</p>
+  <p><strong>Why you need it:</strong> Phase 17 writes scores to BigQuery, but there's no plan for what happens when models silently degrade. Evidently catches: feature distribution shifts (new customer mix), prediction calibration drift, target drift (engagement metrics changing).</p>
+  <p><strong>Integration:</strong> Run as a scheduled BigQuery job weekly. Outputs a drift report HTML. Alert when drift score &gt; threshold.</p>
+  <p><strong>Risk it mitigates:</strong> Models silently going stale post-deployment. Drift not detected until the business notices.</p>
+</div>
+
+<h2>Survival Analysis &amp; CLV (Repos 5-6)</h2>
+
+<div class="repo">
+  <h3>5. CamDavidsonPilon/lifelines <span class="tag tag-prod">Production</span> <span class="tag tag-impact-high">High Impact</span></h3>
+  <div class="meta"><a href="https://github.com/CamDavidsonPilon/lifelines" target="_blank">github.com/CamDavidsonPilon/lifelines</a> &middot; 2.4K+ stars &middot; Maintained by Cam Davidson-Pilon &middot; Used in financial services, healthcare, churn analysis</div>
+  <p><strong>What it does:</strong> Survival analysis library. Kaplan-Meier curves, Cox proportional hazards, Aalen additive models, Weibull AFT. The standard Python library for time-to-event analysis.</p>
+  <p><strong>Why you need it:</strong> This closes Fix #1 from the evaluation. Replace <code>12 &times; MRR</code> with actual retention curves by segment. KaplanMeierFitter gives you "expected retention months over the next 12 months" per segment.</p>
+  <p><strong>Integration:</strong></p>
+<pre><code>from lifelines import KaplanMeierFitter
+kmf = KaplanMeierFitter()
+kmf.fit(durations, event_observed)
+expected_months = kmf.survival_function_.iloc[:12].sum().item()
+clv = mrr * expected_months</code></pre>
+  <p><strong>Risk it mitigates:</strong> Overstating retention value by 30-50%. The single largest source of revenue inflation in the original plan.</p>
+</div>
+
+<div class="repo">
+  <h3>6. sebp/scikit-survival <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/sebp/scikit-survival" target="_blank">github.com/sebp/scikit-survival</a> &middot; 1.2K+ stars &middot; Used in healthcare and reliability engineering</div>
+  <p><strong>What it does:</strong> sklearn-compatible survival models. Cox PH, Random Survival Forest, Gradient Boosted Survival Analysis. Provides feature-conditional survival predictions, not just group-level KM curves.</p>
+  <p><strong>Why you need it:</strong> KaplanMeier (from lifelines) gives you average retention by segment. scikit-survival gives you individual customer retention conditioned on their features. Use when segments are too coarse.</p>
+  <p><strong>Integration:</strong> Drop-in sklearn API. <code>fit(X, y)</code> where y is structured (event_indicator, time_to_event).</p>
+  <p><strong>Risk it mitigates:</strong> Coarse segment-level retention when individual-level signal is available.</p>
+</div>
+
+<h2>Propensity &amp; Calibration (Repos 7-8)</h2>
+
+<div class="repo">
+  <h3>7. optuna/optuna <span class="tag tag-prod">Production</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/optuna/optuna" target="_blank">github.com/optuna/optuna</a> &middot; 11K+ stars &middot; Maintained by Preferred Networks &middot; Used at PyTorch ecosystem scale</div>
+  <p><strong>What it does:</strong> Bayesian hyperparameter optimization with TPE (Tree-structured Parzen Estimator). Smarter than grid search; converges faster than random search.</p>
+  <p><strong>Why you need it:</strong> Phase 7 uses LightGBM/XGBoost. These have 10+ tunable hyperparameters. Without HPO, you're either accepting defaults (underfit) or doing manual grid search (slow, arbitrary).</p>
+  <p><strong>Integration:</strong> Define an <code>objective(trial)</code> function that returns AUC at top decile (not overall AUC &mdash; for targeting, top-decile lift matters more). Run 100 trials. Take best params.</p>
+  <p><strong>Risk it mitigates:</strong> Suboptimal model performance. Defendable answer to "did we tune the model properly?"</p>
+</div>
+
+<div class="repo">
+  <h3>8. interpretml/interpret <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/interpretml/interpret" target="_blank">github.com/interpretml/interpret</a> &middot; 6.2K+ stars &middot; Maintained by Microsoft Research &middot; Used in healthcare, credit, hiring</div>
+  <p><strong>What it does:</strong> Explainable Boosting Machine (EBM) &mdash; a glass-box gradient boosting model that's inherently interpretable. Comparable accuracy to LightGBM with built-in interpretability (no need for SHAP post-hoc).</p>
+  <p><strong>Why you need it:</strong> SHAP-on-LightGBM is interpretable, but only after the fact. EBM produces directly interpretable feature contributions. For executive review, "this customer scored high because their MRR is in the 90th percentile and their Builder sessions dropped 40% in the last 30 days" is more defensible than a SHAP plot.</p>
+  <p><strong>Integration:</strong> Train EBM alongside LightGBM. If AUC gap is &lt;0.02, use EBM as the primary model for transparency. Otherwise use LightGBM with SHAP.</p>
+  <p><strong>Risk it mitigates:</strong> Black-box model objections in executive review. Regulatory exposure if model is used for tiered customer treatment.</p>
+</div>
+
+<h2>Uplift &amp; Causal Inference (Repos 9-10)</h2>
+
+<div class="repo">
+  <h3>9. maks-sh/scikit-uplift <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/maks-sh/scikit-uplift" target="_blank">github.com/maks-sh/scikit-uplift</a> &middot; 800+ stars &middot; Used in marketing analytics at multiple Fortune 500 firms</div>
+  <p><strong>What it does:</strong> sklearn-compatible uplift modeling. Implements T-Learner, S-Learner, X-Learner, R-Learner. Has built-in uplift curve plotting and Qini coefficient.</p>
+  <p><strong>Why you need it:</strong> CausalML and EconML (already in the plan) are powerful but have a steeper learning curve. scikit-uplift is simpler for the common case (estimate CATE from observational treatment data) and produces cleaner visualizations.</p>
+  <p><strong>Integration:</strong> Drop-in sklearn API. Use alongside causalml for cross-validation of methods.</p>
+  <p><strong>Risk it mitigates:</strong> Slower iteration on uplift modeling experiments. Inconsistent visualizations across model types.</p>
+</div>
+
+<div class="repo">
+  <h3>10. DoubleML/doubleml-for-py <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-high">High Impact</span></h3>
+  <div class="meta"><a href="https://github.com/DoubleML/doubleml-for-py" target="_blank">github.com/DoubleML/doubleml-for-py</a> &middot; 600+ stars &middot; Academic + industry use &middot; Implements Chernozhukov et al. 2018</div>
+  <p><strong>What it does:</strong> Double Machine Learning for honest causal inference. Cross-fitting, orthogonalization, valid confidence intervals on CATE estimates &mdash; even when using flexible ML models.</p>
+  <p><strong>Why you need it:</strong> Phase 8 says "estimate confidence intervals where possible." With T-Learner or X-Learner, the confidence intervals are biased when ML models are used (overfitting in the nuisance functions). DoubleML produces valid CIs.</p>
+  <p><strong>Integration:</strong> Wrap a regression model and a propensity model, both sklearn-compatible. DoubleML handles the cross-fitting and orthogonalization.</p>
+  <p><strong>Risk it mitigates:</strong> Overconfident uplift estimates. Phase 8 confidence intervals that don't actually cover the true effect.</p>
+</div>
+
+<h2>Explainability &amp; Fairness (Repos 11-12)</h2>
+
+<div class="repo">
+  <h3>11. interpretml/DiCE <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/interpretml/DiCE" target="_blank">github.com/interpretml/DiCE</a> &middot; 1.5K+ stars &middot; Maintained by Microsoft Research</div>
+  <p><strong>What it does:</strong> Counterfactual explanations. For any customer, finds "what would need to change for this customer to convert?" Generates multiple diverse counterfactuals, optionally with feasibility constraints (e.g., "MRR can change, but country can't").</p>
+  <p><strong>Why you need it:</strong> SHAP tells you which features mattered. DiCE tells you what specific actions would change the outcome. For GTM activation, counterfactuals are more directly usable than feature importance.</p>
+  <p><strong>Integration:</strong> Wrap a trained sklearn-compatible model. Generate 3 counterfactuals per top-100 customer. Translate to plain-English reason codes.</p>
+  <p><strong>Risk it mitigates:</strong> Recommendations that aren't directly actionable. GTM teams getting SHAP plots they can't operationalize.</p>
+</div>
+
+<div class="repo">
+  <h3>12. fairlearn/fairlearn <span class="tag tag-prod">Production</span> <span class="tag tag-impact-high">High Impact</span></h3>
+  <div class="meta"><a href="https://github.com/fairlearn/fairlearn" target="_blank">github.com/fairlearn/fairlearn</a> &middot; 2K+ stars &middot; Maintained by Microsoft / community &middot; Used in regulated industries</div>
+  <p><strong>What it does:</strong> Fairness assessment and mitigation. Computes disparate impact ratios, equalized odds, demographic parity. Provides mitigation algorithms (reweighing, threshold optimization).</p>
+  <p><strong>Why you need it:</strong> Plan tier, country, industry, and tenure are correlated with targeting outcomes. Without explicit fairness analysis, you may inadvertently target in ways that create regulatory or PR risk (e.g., 80% of top decile is one country).</p>
+  <p><strong>Integration:</strong> Run as a Phase 15 reporting step. Output disparate impact ratios across protected/sensitive attributes. Flag any &gt;1.25 or &lt;0.8.</p>
+  <p><strong>Risk it mitigates:</strong> Regulatory exposure. PR risk. Disparate impact lawsuits in geographies where applicable.</p>
+</div>
+
+<h2>Optimization &amp; Sequencing (Repo 13)</h2>
+
+<div class="repo">
+  <h3>13. cvxpy/cvxpy <span class="tag tag-prod">Production</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/cvxpy/cvxpy" target="_blank">github.com/cvxpy/cvxpy</a> &middot; 5.7K+ stars &middot; Stanford / community &middot; Used in finance, energy, robotics</div>
+  <p><strong>What it does:</strong> Convex optimization modeling. More flexible than PuLP (linear only) &mdash; supports quadratic penalties, conic constraints, mixed integer.</p>
+  <p><strong>Why you need it:</strong> The plan's Phase 11 uses PuLP for sequencing. PuLP is fine for pure linear assignment. If you want to add quadratic penalties (e.g., penalize over-allocating to one motion), or have non-linear constraints, cvxpy is more expressive.</p>
+  <p><strong>Integration:</strong> Drop-in for PuLP. Same problem definition style with slightly different syntax. Solver-agnostic (uses ECOS, SCS, GLPK, MOSEK).</p>
+  <p><strong>Risk it mitigates:</strong> Inability to express realistic operational constraints (capacity ceilings, motion balance, fairness).</p>
+</div>
+
+<h2>Reference Architectures (Repos 14-15)</h2>
+
+<div class="repo">
+  <h3>14. GoogleCloudPlatform/marketing-analytics-jumpstart <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/GoogleCloudPlatform/marketing-analytics-jumpstart" target="_blank">github.com/GoogleCloudPlatform/marketing-analytics-jumpstart</a> &middot; Google Cloud reference architecture</div>
+  <p><strong>What it does:</strong> End-to-end marketing analytics pipeline on GCP: BigQuery + Vertex AI + Looker. Includes propensity models, customer segmentation, audience activation, and reporting layers.</p>
+  <p><strong>Why you need it:</strong> Closest reference architecture to your actual stack (BigQuery-first). Use it to validate your data flow, scoring pipeline structure, and BigQuery writeback patterns against a Google-blessed reference.</p>
+  <p><strong>Integration:</strong> Reference only. Don't fork. Pull design patterns: how they structure BigQuery tables for feature serving, how they handle Vertex AI training, how they wire the activation layer.</p>
+  <p><strong>Risk it mitigates:</strong> Inventing patterns Google has already published. Audit-trail gaps that are solved problems elsewhere.</p>
+</div>
+
+<div class="repo">
+  <h3>15. microsoft/MLOpsPython <span class="tag tag-stable">Stable</span> <span class="tag tag-impact-med">Medium Impact</span></h3>
+  <div class="meta"><a href="https://github.com/microsoft/MLOpsPython" target="_blank">github.com/microsoft/MLOpsPython</a> &middot; Microsoft reference for MLOps patterns</div>
+  <p><strong>What it does:</strong> Reference repo for MLOps in Python. CI/CD for ML, model registry patterns, deployment automation, drift monitoring integration.</p>
+  <p><strong>Why you need it:</strong> Reference for how to structure the project's CI/CD around ML artifacts. Includes patterns for: model versioning, test pyramids for ML code, deployment gates.</p>
+  <p><strong>Integration:</strong> Reference only. Pull the CI workflow patterns and test structures. Don't blindly fork.</p>
+  <p><strong>Risk it mitigates:</strong> Inventing MLOps patterns from scratch. CI/CD configurations that miss important ML-specific checks.</p>
+</div>
+
+<h2>What's Already in the Plan (No Changes Needed)</h2>
+
+<p>The original <code>requirements.txt</code> already includes several excellent tools. Don't add to them, just use them properly:</p>
+
+<ul>
+  <li><strong>causalml</strong> (Uber) &mdash; primary uplift modeling library. Augmented by scikit-uplift (#9) for simpler API and DoubleML (#10) for valid CIs.</li>
+  <li><strong>econml</strong> (Microsoft) &mdash; alternative uplift modeling. Use causalml as primary; econml for cross-validation of estimates.</li>
+  <li><strong>shap</strong> &mdash; feature importance and per-prediction attribution. Pair with DiCE (#11) for actionable explanations.</li>
+  <li><strong>lightgbm, xgboost</strong> &mdash; gradient boosting. Pair with Optuna (#7) for HPO and interpretML EBM (#8) for transparency comparison.</li>
+  <li><strong>hdbscan, umap-learn</strong> &mdash; density clustering and visualization. Already good choices.</li>
+  <li><strong>pulp</strong> &mdash; linear optimization for sequencing. cvxpy (#13) is more flexible for non-linear cases.</li>
+  <li><strong>yellowbrick</strong> &mdash; ML visualization. Use for calibration plots and cluster validity.</li>
+</ul>
+
+<div class="callout">
+  <strong>How to use this catalog:</strong> Don't try to add all 15 repos at once. Start with the 4 MLOps Foundation repos (#1-4) and the survival analysis pair (#5-6). Those close the highest-impact gaps. Add the rest as the project matures and specific needs emerge.
+</div>
+
+<p style="font-size: 8pt; color: #888; margin-top: 16px;">Next: see <a href="reliability-path.html">12-Week Reliability Path</a> for the week-by-week execution sequence that integrates these repos and improvements.</p>
+
+</body>
+</html>

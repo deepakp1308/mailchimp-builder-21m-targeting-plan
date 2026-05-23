@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12-Week Reliability Path</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; background: #fff; line-height: 1.4; padding: 24px 32px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 16pt; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 12pt; font-weight: 700; margin-bottom: 8px; margin-top: 24px; border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+  h3 { font-size: 10pt; font-weight: 700; margin-bottom: 6px; margin-top: 12px; color: #1a3a5c; }
+  p { margin-bottom: 8px; }
+  .subtitle { font-size: 10pt; color: #555; font-style: italic; margin-bottom: 16px; }
+
+  .nav { margin-bottom: 16px; padding: 8px 0; border-bottom: 2px solid #1a3a5c; }
+  .nav a { font-size: 9pt; font-weight: 700; color: #1a3a5c; text-decoration: none; margin-right: 20px; }
+  .nav a.active { border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 8px 0 16px 0; }
+  th, td { border: 1px solid #bfbfbf; padding: 6px 10px; vertical-align: top; text-align: left; }
+  th { background: #1a3a5c; color: #fff; font-weight: 700; }
+
+  .week { border: 1px solid #d1d5db; padding: 12px 16px; margin: 12px 0; background: #fafafa; }
+  .week h3 { margin-top: 0; }
+  .week .label { font-size: 8pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+
+  .gate { background: #FEE2E2; border: 2px solid #B91C1C; padding: 10px 14px; margin: 8px 0; font-size: 9pt; }
+  .gate strong { color: #991B1B; }
+
+  ul, ol { margin: 6px 0 6px 20px; }
+  ul li, ol li { margin-bottom: 4px; }
+
+  code { font-family: Consolas, monospace; background: #f5f5f5; padding: 1px 4px; border-radius: 2px; font-size: 8.5pt; }
+
+  .callout { background: #FEF3C7; border: 1px solid #F59E0B; padding: 10px 14px; margin: 12px 0; font-size: 9pt; }
+
+  .milestone { background: #166534; color: #fff; padding: 10px 14px; margin: 8px 0; font-size: 9pt; font-weight: 700; }
+
+  @media print { body { padding: 12px; font-size: 7.5pt; } }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html">Overview</a>
+  <a href="evaluation.html">Evaluation</a>
+  <a href="improvements.html">Phase-by-Phase Improvements</a>
+  <a href="github-repos.html">GitHub Repos</a>
+  <a href="reliability-path.html" class="active">12-Week Reliability Path</a>
+</div>
+
+<h1>12-Week Reliability Path: From Plan to Defensible $21M</h1>
+<p class="subtitle">Week-by-week execution sequence with explicit data gates between phases. The principle: if a gate fails, stop and address the issue rather than carrying broken assumptions forward. This is what turns a smart analytical plan into a high-probability $21M business case.</p>
+
+<div class="callout">
+  <strong>How to read this:</strong> Each week has objectives, deliverables, and a gate at the end. The gate is a hard checkpoint &mdash; you do not proceed to the next week until the gate passes. If the gate fails, you fix the issue or escalate. No silent continuation.
+</div>
+
+<h2>Week-by-Week Sequence</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:80px;">Week</th>
+      <th>Focus</th>
+      <th>Original Plan Phase</th>
+      <th>Gate to Pass</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1-2</td><td>MLOps foundation + schema discovery</td><td>Phase -1, 0, 1</td><td>Data dictionary + GE suite green</td></tr>
+    <tr><td>3-4</td><td>Customer feature table with quality gates</td><td>Phase 2, 3, 4</td><td>Feature backtest + leakage check pass</td></tr>
+    <tr><td>5-6</td><td>Descriptive segmentation + propensity models</td><td>Phase 5, 6, 7</td><td>Lift over baselines + calibration pass</td></tr>
+    <tr><td>7-8</td><td>Uplift modeling + treatment effect estimation</td><td>Phase 8</td><td>Uplift quality labels assigned</td></tr>
+    <tr><td>9</td><td>Survival-based CLV + confidence discount math</td><td>Phase 9, 10</td><td>Retention curves + EV formula documented</td></tr>
+    <tr><td>10</td><td>EV scoring + Monte Carlo + sequencing</td><td>Phase 10, 11, 12</td><td>$21M P10/P50/P90 produced</td></tr>
+    <tr><td>11</td><td>Backtesting + fairness audit + drift baselines</td><td>Phase 14, 15</td><td>Validation report green</td></tr>
+    <tr><td>12</td><td>Executive readout + BigQuery writeback</td><td>Phase 15, 16, 17, 18, 19</td><td>Acceptance criteria met</td></tr>
+  </tbody>
+</table>
+
+<div class="week">
+  <div class="label">Week 1-2 (Foundation)</div>
+  <h3>MLOps Foundation + Schema Discovery</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Initialize MLflow tracking server (local file-based store is fine for now)</li>
+    <li>Set up Great Expectations and define data contracts for the top 20 BigQuery tables identified in schema discovery</li>
+    <li>Create <code>config/run_metadata.yaml</code> capturing git commit, BigQuery snapshot date, model versions, seeds</li>
+    <li>Run schema discovery, produce <code>outputs/data_dictionary.md</code> with column-level quality scores</li>
+    <li>Document the 41 data domains from the plan (customers, billing, Builder behavior, etc.) with table mappings</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li><code>great_expectations/</code> directory with checkpoints for at least 10 critical tables</li>
+    <li><code>outputs/data_dictionary.md</code> with quality scores per column (null rate, cardinality, freshness, drift)</li>
+    <li>MLflow experiment <code>builder_21m_targeting</code> created and accessible</li>
+    <li>One trial MLflow run logged end-to-end as a smoke test</li>
+  </ul>
+</div>
+
+<div class="gate">
+  <strong>Gate 1 (End of Week 2):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Data dictionary covers &ge;90% of fields needed for Phase 3 features</li>
+    <li>GE suite passes for at least the 10 most critical tables</li>
+    <li>At least one feature can be traced end-to-end from raw event to scoring (proof of feature lineage)</li>
+    <li>MLflow logs a complete trial run with hyperparameters, metrics, and artifacts</li>
+  </ul>
+  <strong>If this gate fails:</strong> Spend an additional week on schema discovery. Do not proceed to feature engineering on shaky data foundations.
+</div>
+
+<div class="week">
+  <div class="label">Week 3-4 (Features)</div>
+  <h3>Customer Feature Table with Quality Gates</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Build the Phase 3 customer feature table in BigQuery (8 feature groups: profile, intent, activation, friction, marketing maturity, value/risk, trend, eligibility)</li>
+    <li>Hash every feature SQL definition; store as <code>feature_definitions.yaml</code> with version + date</li>
+    <li>Implement Phase 4 target labels with explicit leakage checks (feature_date &le; scoring_date AND label_date &gt; scoring_date)</li>
+    <li>Run a cohort sanity check: compute key features for a known cohort 90 days ago and compare to dashboard reality (must be within 5%)</li>
+    <li>Backtest each feature: does the feature value 90 days ago predict the outcome at 60 days ago?</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li>BigQuery customer feature table with 1 row per customer-scoring-date</li>
+    <li><code>feature_definitions.yaml</code> with SQL hashes, descriptions, owner, modeling readiness flag</li>
+    <li>Leakage check report: 0 violations</li>
+    <li>Cohort sanity check report: all features within 5% of dashboard truth</li>
+  </ul>
+</div>
+
+<div class="gate">
+  <strong>Gate 2 (End of Week 4):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Feature table contains &ge;1M customers with &lt;5% missingness on critical features</li>
+    <li>Zero leakage violations across all (feature, label) pairs</li>
+    <li>Cohort sanity check passes (within 5% of dashboard truth) for all critical features</li>
+    <li>GE suite passing on the feature table</li>
+  </ul>
+  <strong>If this gate fails:</strong> Investigate failing feature individually. Common issues: window definition off by one day, event filter too narrow, partition pruning wrong.
+</div>
+
+<div class="week">
+  <div class="label">Week 5-6 (Descriptive + Propensity)</div>
+  <h3>Descriptive Segmentation + Propensity Models</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Run Phase 5 descriptive segmentation with minimum segment size = 100, significance test on key metrics</li>
+    <li>Train Phase 7 propensity models: 10 models (activation, completion, send, conversion, upgrade, churn, etc.)</li>
+    <li>Use Optuna for HPO (100 trials per model, optimize for top-decile lift, not overall AUC)</li>
+    <li>Train interpretML EBM alongside LightGBM; if AUC gap &lt;0.02, prefer EBM for transparency</li>
+    <li>Calibrate every model with isotonic regression; produce calibration plots</li>
+    <li>Run baseline rules to beat: highest MRR first, highest Builder sessions first, plan-tier-only, random</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li><code>outputs/baseline_segment_metrics.csv</code> with significance-tested metrics per segment</li>
+    <li>10 trained propensity models registered in MLflow with hyperparameters and metrics</li>
+    <li>Calibration plots for each model (predicted vs actual by decile)</li>
+    <li>Lift-over-baseline report: model lift vs each of the 4 baselines, by decile</li>
+  </ul>
+</div>
+
+<div class="gate">
+  <strong>Gate 3 (End of Week 6):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Top-decile lift &gt; 2x baseline for at least 7 of 10 propensity models</li>
+    <li>Brier score &lt; 0.25 (well-calibrated) for at least 7 of 10 models</li>
+    <li>No model has AUC &lt; 0.65 (random would be 0.50; below 0.65 means there's no signal)</li>
+    <li>Models beat all 4 baseline rules on top-decile lift</li>
+  </ul>
+  <strong>If this gate fails:</strong> Models that don't beat baselines may indicate insufficient features, label noise, or fundamental predictability limits. Investigate before adding more model complexity.
+</div>
+
+<div class="week">
+  <div class="label">Week 7-8 (Uplift)</div>
+  <h3>Uplift Modeling + Treatment Effect Estimation</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Identify all historical treatment data: feature flag exposure, beta participation, lifecycle campaign exposure, A/B test rollouts</li>
+    <li>For each treatment: check sample size (n per arm) and covariate balance (SMD &lt; 0.1)</li>
+    <li>Apply the sample-size rules from the <a href="improvements.html">Improvements page</a>: estimate CATE only when n &ge; 1000 per arm; otherwise label as Directional or Assumption Based</li>
+    <li>Use causalml (T-Learner, X-Learner, Causal Forest) as primary; DoubleML for honest confidence intervals; scikit-uplift for visualization</li>
+    <li>Where no treatment data exists, document low/base/high uplift scenarios with clear assumptions</li>
+    <li>Every customer gets one of 4 uplift quality labels: Validated, Directional, Assumption, Insufficient</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li>Uplift estimate per customer per eligible initiative with quality label</li>
+    <li>Covariate balance report for each treatment</li>
+    <li>Sensitivity bounds for CATE estimates (e.g., E-value)</li>
+    <li>Documented assumptions for Assumption-Based estimates (scenarios with rationale)</li>
+  </ul>
+</div>
+
+<div class="gate">
+  <strong>Gate 4 (End of Week 8):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Every customer-initiative pair has an uplift estimate with quality label</li>
+    <li>Validated uplift estimates have valid CIs (from DoubleML or bootstrap)</li>
+    <li>Assumption-Based estimates have written rationale + low/base/high scenarios</li>
+    <li>SUTVA assumption is explicitly checked (treatment doesn't contaminate control)</li>
+  </ul>
+  <strong>If this gate fails:</strong> The most common failure here is "we thought we had treatment data but it was contaminated." Better to label more estimates as Assumption-Based and be honest than to overclaim causal effects.
+</div>
+
+<div class="week">
+  <div class="label">Week 9 (CLV + Confidence)</div>
+  <h3>Survival-Based CLV + Confidence Discount Math</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Compute Kaplan-Meier survival curves by segment using <code>lifelines</code></li>
+    <li>For each segment, integrate area under survival curve over 12 months to get expected retention months</li>
+    <li>Replace Phase 9 <code>12 &times; MRR</code> formula with <code>expected_retention_months &times; MRR</code></li>
+    <li>Document the confidence discount formula explicitly:<br>
+      <code>confidence_discount = (sample_size_score &times; treatment_evidence_score &times; calibration_score)^(1/3)</code></li>
+    <li>Implement each score component as a documented function</li>
+    <li>Update the EV formula to include dependency_score and trust_risk_score from the initiative config</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li>Survival curves chart per segment (paid/free/trial &times; ecommerce/non &times; tenure band)</li>
+    <li>Updated revenue value function using survival-based retention</li>
+    <li>Confidence discount formula documented in <code>technical_appendix.md</code> with worked examples</li>
+    <li>EV formula updated to incorporate dependency and trust risk multipliers</li>
+  </ul>
+</div>
+
+<div class="gate">
+  <strong>Gate 5 (End of Week 9):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Survival curves produced for &ge;10 customer segments</li>
+    <li>Expected retention months computed per segment (must be reasonable: paid steady-state 8-11, trial 4-7, free 5-9)</li>
+    <li>Confidence discount produces a number in [0,1] for every customer, traceable to inputs</li>
+    <li>EV formula reviewed and signed off by a peer with statistics/ML background</li>
+  </ul>
+  <strong>If this gate fails:</strong> If retention curves look implausible, check for survivorship bias (computed only on surviving customers) or cohort definition errors.
+</div>
+
+<div class="week">
+  <div class="label">Week 10 (EV + Monte Carlo + Sequencing)</div>
+  <h3>Expected Value Scoring + Monte Carlo + Sequencing</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Compute EV per customer per eligible initiative using the full formula</li>
+    <li>Run Monte Carlo simulation (10,000 iterations) on the $21M projection; sample from distributions for P(success), uplift, revenue</li>
+    <li>Report P10/P50/P90 of total aggregate EV</li>
+    <li>Run PuLP/cvxpy optimization with the customer-overlap constraint: each customer assigned to at most one initiative</li>
+    <li>Apply quantitative Wave 1-4 thresholds (P(success), confidence, EV cutoffs)</li>
+    <li>Produce <code>outputs/customer_scores.csv</code>, <code>outputs/segment_scores.csv</code>, <code>outputs/initiative_sequence.csv</code></li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li>$21M projection with P10/P50/P90 confidence band</li>
+    <li>Monte Carlo histogram chart</li>
+    <li>Wave 1-4 assignments with no customer appearing in more than one wave</li>
+    <li>Sequence optimization report: total customers, total EV, capacity utilization per motion</li>
+  </ul>
+</div>
+
+<div class="milestone">
+  Milestone (End of Week 10): The $21M number now has a confidence interval. The recommendation is no longer "we project $21M" but "we project a median of $X with an 80% confidence interval of [Y, Z]."
+</div>
+
+<div class="gate">
+  <strong>Gate 6 (End of Week 10):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Monte Carlo produces a sensible P10/P50/P90 (P50 should be within 30% of the deterministic point estimate)</li>
+    <li>No customer appears in more than one wave assignment</li>
+    <li>Wave 1 has at least 1000 customers and a defendable EV-per-customer</li>
+    <li>Cumulative EV across all waves &ge; $21M at the P50 level (if not, document the gap)</li>
+  </ul>
+  <strong>If this gate fails:</strong> If P50 is far below $21M, the gap analysis becomes the headline finding. Don't massage numbers to hit $21M. Report what the data supports.
+</div>
+
+<div class="week">
+  <div class="label">Week 11 (Validation)</div>
+  <h3>Backtesting + Fairness Audit + Drift Baselines</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Run Phase 14 backtests: lift by decile, revenue by decile, cluster stability across time windows</li>
+    <li>Cluster stability check: Adjusted Rand Index across monthly samples; ARI &ge; 0.6 to consider clusters stable</li>
+    <li>Audit top 100 customer recommendations: do reason codes make business sense? Are the same customers showing up repeatedly?</li>
+    <li>Fairness audit with fairlearn: disparate impact ratios across plan tier, country, industry, tenure</li>
+    <li>Set up Evidently drift monitoring baselines for feature distributions and predictions</li>
+    <li>Sensitivity analysis: how does $21M change if confidence discount is 20% lower? If uplift is 20% lower? If revenue values are 20% lower?</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li>Backtest report: lift, revenue, calibration, cluster stability</li>
+    <li>Fairness audit: disparate impact ratios, flagged segments</li>
+    <li>Sensitivity analysis showing $21M elasticity to key assumptions</li>
+    <li>Evidently drift baselines documented and ready for production monitoring</li>
+  </ul>
+</div>
+
+<div class="gate">
+  <strong>Gate 7 (End of Week 11):</strong>
+  <ul style="margin-top: 4px;">
+    <li>Top-decile customers in backtest realized &gt; 2x baseline revenue</li>
+    <li>No disparate impact ratio &gt; 1.25 or &lt; 0.8 on any protected attribute (or, if flagged, documented mitigation plan)</li>
+    <li>Sensitivity analysis shows $21M is reasonably robust to ±20% changes in key assumptions</li>
+    <li>Cluster ARI &ge; 0.6 across time windows (or unstable clusters explicitly excluded from final recommendation)</li>
+  </ul>
+  <strong>If this gate fails:</strong> A weak backtest is the most important failure to address. If top-decile customers in backtest didn't outperform, the entire model needs to be re-examined. Don't go to executive readout with a model that fails its own validation.
+</div>
+
+<div class="week">
+  <div class="label">Week 12 (Readout)</div>
+  <h3>Executive Readout + BigQuery Writeback</h3>
+  <p><strong>Objectives:</strong></p>
+  <ul>
+    <li>Produce <code>outputs/executive_summary.md</code> with: recommendation, top segments, sequence, P10/P50/P90 revenue, confidence level, key assumptions, risks, mitigations, data gaps, next decisions</li>
+    <li>Produce <code>outputs/technical_appendix.md</code> with: data sources, feature definitions, model choices, validation results, formulas, methodology</li>
+    <li>Run Phase 17 BigQuery writeback with model_version, feature_set_version, scoring_pipeline_version, data_snapshot_date columns</li>
+    <li>Generate Phase 16 visual outputs: cluster map, revenue waterfall (Monte Carlo), lift charts, calibration, SHAP, survival curves, fairness dashboard</li>
+    <li>Conduct dry-run executive readout with a stand-in audience (data science peer, product peer)</li>
+    <li>Iterate on the readout based on feedback before the real presentation</li>
+  </ul>
+  <p><strong>Deliverables:</strong></p>
+  <ul>
+    <li>Executive summary (1-page) + supporting deck</li>
+    <li>Technical appendix (full methodology)</li>
+    <li>BigQuery writeback table populated and queryable</li>
+    <li>All Phase 16 visuals saved to <code>outputs/charts/</code></li>
+    <li>Phase 19 acceptance criteria checklist all green</li>
+  </ul>
+</div>
+
+<div class="milestone">
+  Final Milestone (End of Week 12): Defensible $21M business case. Executive readout delivered. BigQuery writeback live. The work is reproducible, validated, audit-ready, and has a clear path to operationalization.
+</div>
+
+<h2>What Could Still Go Wrong</h2>
+
+<p>Even with all gates passed, here are the failure modes to watch for:</p>
+
+<ul>
+  <li><strong>Concept drift between training and FY27 execution.</strong> Klaviyo shipped Universal Content in Spring 2026. Customer Builder behavior may shift. The model trained on pre-shift data may not predict post-shift behavior accurately. Plan a retrain cadence (quarterly minimum).</li>
+  <li><strong>Roadmap slippage.</strong> The plan's $21M assumes initiatives ship on schedule. If Q1 initiatives slip to Q3, the model's wave assignments are stale. Build in a re-sequencing checkpoint after each roadmap milestone.</li>
+  <li><strong>Wave 1 saturation.</strong> The model may identify 5,000 customers in Wave 1, but GTM/CSM capacity may be 500. Without capacity-aware sequencing, the top 4,500 don't get reached. Validate motion capacity early.</li>
+  <li><strong>Counterfactual creep.</strong> Once customers are targeted, they're no longer counterfactual to themselves. Future backtests need a held-out control group, not just historical comparison.</li>
+  <li><strong>Goodhart's Law on activation.</strong> If "30-day campaign send" becomes the optimization target, the model may target customers whose first send was inevitable. Watch the gap between propensity and uplift; if it narrows, the model is targeting people who would have acted anyway.</li>
+</ul>
+
+<h2>Probability of Success Assessment</h2>
+
+<p>With the 15 improvements and 12-week sequence applied, here's an honest read on what success looks like:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Outcome</th>
+      <th>Probability</th>
+      <th>What It Depends On</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Deliver a defensible analytical framework</td>
+      <td>~90%</td>
+      <td>Following the 12-week sequence with gates. The framework is well-established practice.</td>
+    </tr>
+    <tr>
+      <td>Identify customers worth ~$15-25M in incremental ARR</td>
+      <td>~70-80%</td>
+      <td>Data quality, treatment data availability for uplift, retention curve realism. If data supports it, the math will surface the opportunity.</td>
+    </tr>
+    <tr>
+      <td>Actually realize $21M in FY27 through execution</td>
+      <td>~30-50%</td>
+      <td>GTM execution, roadmap delivery on schedule, capacity to reach Wave 1 customers, market conditions, competitive response. The model identifies opportunity; execution captures it.</td>
+    </tr>
+    <tr>
+      <td>Have a continuous learning loop that improves quarter-over-quarter</td>
+      <td>~80%</td>
+      <td>MLflow + Evidently + Feast (or equivalent) being in place. If the MLOps foundation is solid, the loop runs itself.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>Honest take:</strong> The analytical framework is high-probability to deliver. The $21M outcome is moderate-probability because it depends on execution, not just modeling. The biggest predictor of actually capturing $21M is whether the GTM/CSM/Product teams use the recommendations as designed, with the experimentation rigor and re-targeting cadence that the model assumes. The plan plus these improvements gives you the best chance &mdash; but the model is the start, not the finish.
+</div>
+
+<p style="font-size: 8pt; color: #888; margin-top: 16px;">End of evaluation. See <a href="index.html">Overview</a> to return to the landing page.</p>
+
+</body>
+</html>

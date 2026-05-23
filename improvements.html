@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase-by-Phase Improvements</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; background: #fff; line-height: 1.4; padding: 24px 32px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 16pt; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 12pt; font-weight: 700; margin-bottom: 8px; margin-top: 24px; border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+  h3 { font-size: 10pt; font-weight: 700; margin-bottom: 6px; margin-top: 12px; color: #1a3a5c; }
+  p { margin-bottom: 8px; }
+  .subtitle { font-size: 10pt; color: #555; font-style: italic; margin-bottom: 16px; }
+
+  .nav { margin-bottom: 16px; padding: 8px 0; border-bottom: 2px solid #1a3a5c; }
+  .nav a { font-size: 9pt; font-weight: 700; color: #1a3a5c; text-decoration: none; margin-right: 20px; }
+  .nav a.active { border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+
+  .phase { border: 1px solid #d1d5db; padding: 12px 16px; margin: 12px 0; background: #fafafa; }
+  .phase h3 { margin-top: 0; }
+  .phase .label { font-size: 8pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+  .phase.high-impact { border-left: 4px solid #B91C1C; background: #FEF2F2; }
+  .phase.high-impact .label { color: #991B1B; }
+
+  code { font-family: Consolas, monospace; background: #f5f5f5; padding: 1px 4px; border-radius: 2px; font-size: 8.5pt; }
+  pre { background: #1f2937; color: #f3f4f6; padding: 10px 14px; border-radius: 4px; font-size: 8pt; line-height: 1.45; overflow-x: auto; margin: 8px 0; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 8px 0 16px 0; }
+  th, td { border: 1px solid #bfbfbf; padding: 6px 10px; vertical-align: top; text-align: left; }
+  th { background: #1a3a5c; color: #fff; font-weight: 700; }
+
+  ul, ol { margin: 6px 0 6px 20px; }
+  ul li, ol li { margin-bottom: 4px; }
+
+  .tag { display: inline-block; font-size: 7pt; font-weight: 700; padding: 1px 6px; border-radius: 2px; margin-left: 4px; vertical-align: middle; letter-spacing: 0.03em; text-transform: uppercase; }
+  .tag-add { background: #166534; color: #fff; }
+  .tag-change { background: #92400E; color: #fff; }
+  .tag-keep { background: #1E40AF; color: #fff; }
+
+  .callout { background: #FEF3C7; border: 1px solid #F59E0B; padding: 10px 14px; margin: 12px 0; font-size: 9pt; }
+
+  @media print { body { padding: 12px; font-size: 7.5pt; } }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html">Overview</a>
+  <a href="evaluation.html">Evaluation</a>
+  <a href="improvements.html" class="active">Phase-by-Phase Improvements</a>
+  <a href="github-repos.html">GitHub Repos</a>
+  <a href="reliability-path.html">12-Week Reliability Path</a>
+</div>
+
+<h1>Phase-by-Phase Improvements</h1>
+<p class="subtitle">For each of the 19 phases in the original plan: what to ADD, what to CHANGE, and what to KEEP. Includes specific formulas, code snippets, and validation rules. Phases marked in red have the highest impact on $21M defensibility.</p>
+
+<div class="callout">
+  <strong>Reading guide:</strong> <span class="tag tag-add">Add</span> means a new step the original plan doesn't have. <span class="tag tag-change">Change</span> means modifying an existing step. <span class="tag tag-keep">Keep</span> means the original step is fine as-is.
+</div>
+
+<div class="phase high-impact">
+  <div class="label">New Phase (Insert Before Phase 0)</div>
+  <h3>Phase -1: MLOps Foundation <span class="tag tag-add">Add</span></h3>
+  <p>The plan jumps straight to schema discovery without a reproducibility layer. Add this phase up front.</p>
+  <ol>
+    <li><strong>Initialize MLflow tracking server.</strong> Local file-based store is fine for solo work; switch to BigQuery-backed for team work.</li>
+    <li><strong>Define Great Expectations data contracts</strong> for every BigQuery table the agent reads from. At minimum: column existence, type, non-null thresholds, value range, freshness.</li>
+    <li><strong>Set up feature versioning.</strong> Even without Feast, hash every feature SQL definition; store as <code>feature_definitions.yaml</code> with version + date.</li>
+    <li><strong>Add a project-wide <code>config/run_metadata.yaml</code></strong> that captures git commit, BigQuery snapshot date, model versions, and seeds.</li>
+  </ol>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 0: Environment Setup</div>
+  <h3>Keep config.py and bq_client.py, but add MLflow + GE bootstrapping <span class="tag tag-change">Change</span></h3>
+  <p>Extend <code>config.py</code> to include:</p>
+<pre><code>import mlflow
+MLFLOW_TRACKING_URI = "file:./mlruns"  # or BigQuery-backed for prod
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_experiment("builder_21m_targeting")
+GE_CONTEXT_ROOT = "./great_expectations"</code></pre>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 1: Schema Discovery</div>
+  <h3>Add column-level quality scoring to the data dictionary <span class="tag tag-change">Change</span></h3>
+  <p>The plan's data dictionary captures field metadata. Add a quality score column:</p>
+  <ul>
+    <li><strong>Null rate</strong> (% of rows where field is null in the last 30 days)</li>
+    <li><strong>Cardinality</strong> (unique values; flag if &lt;2 or near row-count for categorical use)</li>
+    <li><strong>Freshness lag</strong> (days between max event date and today)</li>
+    <li><strong>Drift score</strong> (KS test vs. the same field 90 days ago)</li>
+    <li><strong>Modeling readiness flag</strong> (computed from the above; gates inclusion in feature table)</li>
+  </ul>
+  <p>Use <code>INFORMATION_SCHEMA.COLUMN_FIELD_PATHS</code> for nested STRUCT/REPEATED fields. Don't assume flat schemas.</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 2: Initiative Config</div>
+  <h3>Add quantified dependency and trust risk scores <span class="tag tag-change">Change</span></h3>
+  <p>The original config uses <code>low_or_medium_or_high</code> for dependency_level and customer_trust_risk. Replace with explicit numeric multipliers so the EV formula can incorporate them:</p>
+<pre><code>dependency_score: 0.7  # 1.0 = no dependency, 0.5 = ships only if X also ships
+trust_risk_score: 0.9  # 1.0 = no risk, 0.7 = material brand/compliance risk
+confidence_prior: 0.6  # used in Phase 10 confidence discount</code></pre>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 3: Customer Feature Table</div>
+  <h3>Add feature lineage and statistical guardrails <span class="tag tag-change">Change</span></h3>
+  <ul>
+    <li><strong>Window leak check:</strong> For every feature with a time window (e.g., "30-day Builder sessions"), validate that no feature uses post-scoring-date data.</li>
+    <li><strong>Cohort cohort sanity check:</strong> Compute the feature for a known cohort 90 days ago and compare to dashboard reality. If off by &gt;5%, stop.</li>
+    <li><strong>Feature SQL fingerprinting:</strong> Hash each feature's SQL definition; store in <code>feature_definitions.yaml</code>. Changing the SQL invalidates historical scores.</li>
+    <li><strong>Trend features:</strong> Use ratio + delta + Z-score, not just delta. A 50% drop on 100 sessions is different from a 50% drop on 2 sessions.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 4: Target Labels</div>
+  <h3>Add labeling rules to prevent leakage explicitly <span class="tag tag-change">Change</span></h3>
+  <p>The plan lists validation rules ("don't use future behavior as a feature") but doesn't enforce them programmatically. Add an automated check:</p>
+<pre><code># For every (feature, label) pair, assert feature_date &lt;= scoring_date AND label_date &gt; scoring_date
+assert features_df['event_date'].max() &lt;= scoring_date
+assert labels_df['outcome_date'].min() &gt; scoring_date</code></pre>
+  <p>Run this check as a Great Expectations expectation in the pipeline.</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 5: Descriptive Segmentation</div>
+  <h3>Add minimum segment size + statistical significance gates <span class="tag tag-change">Change</span></h3>
+  <p>For every descriptive cut (paid &times; tier &times; tenure), require:</p>
+  <ul>
+    <li><strong>Minimum segment size</strong>: n &ge; 100 customers (configurable). Smaller segments get rolled into "Other" to prevent noise.</li>
+    <li><strong>Significance test on key metrics</strong>: confidence interval around activation rate, churn rate, MRR. Don't report segment differences as material if CIs overlap.</li>
+    <li><strong>Output a "headline differentiator" per segment</strong>: the metric that most differs from the global average, with effect size.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 6: Advanced Clustering</div>
+  <h3>Add decision-tree-on-cluster-labels for explainable rules <span class="tag tag-change">Change</span></h3>
+  <p>The plan names clusters manually ("High value frustrated power users"). Replace with a programmatic step:</p>
+  <ol>
+    <li>Run clustering as planned (HDBSCAN, GMM, K-means).</li>
+    <li>Fit a shallow decision tree (max_depth=3-4) with cluster label as target, features as predictors.</li>
+    <li>Extract leaf rules ("if Builder_sessions_30d &gt; 5 AND MRR_band == 'high' AND friction_score &gt; 0.7 then Cluster_3").</li>
+    <li>Name clusters using the dominant leaf rule, not by eyeballing centroids.</li>
+  </ol>
+  <p>This produces if-then rules that are reproducible, testable, and translatable to product/GTM teams.</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 7: Propensity Modeling</div>
+  <h3>Add Optuna for HPO and interpretML as glass-box alternative <span class="tag tag-change">Change</span></h3>
+  <ul>
+    <li><strong>Optuna study</strong> for each propensity model: 100 trials, time-based cross-validation, optimize for AUC at top decile (not overall AUC).</li>
+    <li><strong>interpretML Explainable Boosting Machine</strong> as a second model that is inherently interpretable. Compare AUC vs LightGBM. If close (&lt; 0.02 AUC gap), use EBM for transparency.</li>
+    <li><strong>Calibration step</strong>: use isotonic regression to calibrate output probabilities. Uncalibrated XGBoost probabilities are not directly comparable across customers.</li>
+    <li><strong>Calibration plot mandatory output</strong>: predicted vs actual by decile, with Brier score.</li>
+  </ul>
+</div>
+
+<div class="phase high-impact">
+  <div class="label">Phase 8: Uplift Modeling</div>
+  <h3>Add minimum sample size guidance and method selection rules <span class="tag tag-change">Change</span></h3>
+  <p>The plan says "use uplift where data supports it" without defining "supports." Replace with explicit rules:</p>
+  <table>
+    <thead>
+      <tr><th>Treatment Data Condition</th><th>Action</th><th>Method</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>n &ge; 1000 per arm, balanced covariates (SMD &lt; 0.1)</td><td>Estimate CATE</td><td>causalml X-Learner, R-Learner, or Causal Forest</td></tr>
+      <tr><td>n &ge; 500 per arm, some imbalance</td><td>Estimate CATE with sensitivity bounds</td><td>DoubleML with propensity-trimming at 0.05/0.95</td></tr>
+      <tr><td>n &ge; 200 per arm or known confounding</td><td>Label as "Directionally Supported"</td><td>scikit-uplift T-Learner with bootstrap CIs</td></tr>
+      <tr><td>n &lt; 200 per arm or no treatment data</td><td>Label as "Assumption Based"</td><td>Use propensity + low/base/high scenarios</td></tr>
+    </tbody>
+  </table>
+  <p>Every customer uplift estimate gets one of these four labels. The labels propagate to the final EV scoring.</p>
+</div>
+
+<div class="phase high-impact">
+  <div class="label">Phase 9: Revenue Value Modeling</div>
+  <h3>Replace 12&times;MRR with survival-based CLV <span class="tag tag-change">Change</span></h3>
+  <p>This is Fix #1 from the <a href="evaluation.html">evaluation</a>. The hardcoded <code>12 &times; MRR</code> overstates retention value because real customers churn at varying rates.</p>
+  <p><strong>New approach:</strong></p>
+  <ol>
+    <li>Use <code>lifelines.KaplanMeierFitter</code> to compute survival curves by segment (plan tier &times; tenure band &times; ecommerce flag).</li>
+    <li>For each segment, integrate the area under the survival curve over 12 months to get expected retention months.</li>
+    <li>Expected retention value = MRR &times; expected retention months.</li>
+  </ol>
+  <p><strong>Example formula:</strong></p>
+<pre><code>from lifelines import KaplanMeierFitter
+
+kmf = KaplanMeierFitter()
+kmf.fit(durations=df_segment['tenure_months'], event_observed=df_segment['churned'])
+expected_retention_months = kmf.survival_function_.iloc[:12].sum().item()
+expected_value = current_mrr * expected_retention_months</code></pre>
+  <p>For paid customers with 50% retention at month 12, this produces ~8 &times; MRR, not 12 &times; MRR. For high-tenure customers with 80% retention, it produces ~10-11 &times; MRR. For trial/new customers with 30% retention, it produces ~5 &times; MRR.</p>
+  <p>Use <code>scikit-survival</code> when you want feature-conditional survival models (e.g., RandomSurvivalForest) for individual customer expected retention.</p>
+</div>
+
+<div class="phase high-impact">
+  <div class="label">Phase 10: Expected Value Scoring</div>
+  <h3>Define confidence discount math explicitly <span class="tag tag-change">Change</span></h3>
+  <p>This is Fix #3 from the <a href="evaluation.html">evaluation</a>. The plan uses <code>confidence_discount</code> in the EV formula but never defines it. Use this:</p>
+<pre><code>def confidence_discount(customer):
+    sample_score = min(1.0, log(n_similar_customers + 1) / log(1000 + 1))
+    treatment_score = {
+        "validated": 1.0,
+        "directional": 0.7,
+        "assumption": 0.4,
+        "insufficient": 0.2
+    }[customer.uplift_quality_label]
+    calibration_score = 1.0 - abs(predicted_prob - actual_rate_in_decile)
+    return (sample_score * treatment_score * calibration_score) ** (1/3)</code></pre>
+  <p>The geometric mean prevents any single weak component from dominating, and gives a number in [0,1] that's interpretable as "what fraction of the raw EV should we believe."</p>
+
+  <h3>Add dependency and trust risk multipliers <span class="tag tag-add">Add</span></h3>
+  <p>Extend the EV formula to incorporate the dependency_score and trust_risk_score from the initiative config:</p>
+<pre><code>expected_value = (
+    eligibility *
+    reachability *
+    p_success *
+    uplift *
+    revenue_value *
+    confidence_discount *
+    dependency_score *      # NEW
+    trust_risk_score        # NEW
+)</code></pre>
+  <p>An initiative with high engineering dependency (score 0.5) or high trust risk (score 0.7) gets correctly discounted in the ranking, not just flagged as risky.</p>
+</div>
+
+<div class="phase high-impact">
+  <div class="label">Phase 11: Sequence Optimization</div>
+  <h3>Add customer overlap constraint to prevent double-counting <span class="tag tag-change">Change</span></h3>
+  <p>This is Fix #5 from the <a href="evaluation.html">evaluation</a>. The plan optimizes sequencing but doesn't address the case where customer X is assigned to multiple initiatives.</p>
+  <p><strong>PuLP formulation:</strong></p>
+<pre><code>from pulp import LpProblem, LpMaximize, LpVariable, lpSum, LpBinary
+
+prob = LpProblem("BuilderTargeting", LpMaximize)
+
+# x[c,i] = 1 if customer c is assigned to initiative i
+x = {(c, i): LpVariable(f"x_{c}_{i}", cat=LpBinary)
+     for c in customers for i in eligible_initiatives[c]}
+
+# Objective: maximize total EV
+prob += lpSum(EV[c, i] * x[c, i] for (c, i) in x)
+
+# Constraint: each customer assigned to at most one initiative
+for c in customers:
+    prob += lpSum(x[c, i] for i in eligible_initiatives[c]) &lt;= 1
+
+# Constraint: per-initiative capacity (Wave 1 = first N customers)
+for i in initiatives:
+    prob += lpSum(x[c, i] for c in customers_for(i)) &lt;= capacity[i]
+
+# Constraint: roadmap quarter availability
+for c, i in x:
+    if i.quarter == "Q1" and current_quarter != "Q1":
+        prob += x[c, i] == 0
+
+prob.solve()</code></pre>
+  <p>Use <code>cvxpy</code> if you need non-linear constraints (e.g., quadratic penalties for over-allocating to one motion).</p>
+
+  <h3>Replace qualitative wave thresholds with numeric cutoffs <span class="tag tag-change">Change</span></h3>
+  <p>Wave 1 = "P(success) &ge; 0.6 AND confidence_discount &ge; 0.7 AND EV_base &ge; $X". Wave 2 = lower thresholds. Wave 3 = experiment required. Wave 4 = strategic / future.</p>
+</div>
+
+<div class="phase high-impact">
+  <div class="label">Phase 12: $21M Waterfall</div>
+  <h3>Add Monte Carlo simulation for confidence intervals <span class="tag tag-add">Add</span></h3>
+  <p>This is Fix #4 from the <a href="evaluation.html">evaluation</a>. Replace the point estimate with a P10/P50/P90 distribution.</p>
+<pre><code>import numpy as np
+
+n_simulations = 10000
+results = []
+
+for _ in range(n_simulations):
+    total = 0
+    for customer, init in assignments:
+        # Sample from distributions over each EV component
+        p_success_sample = np.random.beta(p_success_alpha, p_success_beta)
+        uplift_sample = np.random.normal(uplift_mean, uplift_se)
+        revenue_sample = np.random.lognormal(revenue_log_mean, revenue_log_sd)
+        ev_sample = (eligibility * reachability *
+                     p_success_sample * uplift_sample *
+                     revenue_sample * confidence_discount)
+        total += ev_sample
+    results.append(total)
+
+p10, p50, p90 = np.percentile(results, [10, 50, 90])
+print(f"$21M projection: P10={p10/1e6:.1f}M, P50={p50/1e6:.1f}M, P90={p90/1e6:.1f}M")</code></pre>
+  <p>Report all three numbers. "We project a median of $19M with an 80% confidence interval of $14M-$24M" is more honest and more decision-useful than "We project $21M."</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 13: Explainability</div>
+  <h3>Add DiCE counterfactual explanations <span class="tag tag-add">Add</span></h3>
+  <p>SHAP tells you which features mattered. DiCE tells you "what would need to change for this customer to convert?" This is more actionable for GTM.</p>
+<pre><code>from dice_ml import Data, Model, Dice
+d = Data(dataframe=train_df, continuous_features=cont_cols, outcome_name='converted')
+m = Model(model=lgbm_model, backend='sklearn')
+exp = Dice(d, m)
+cf = exp.generate_counterfactuals(
+    query_instance=customer_row,
+    total_CFs=3,
+    desired_class=1
+)</code></pre>
+  <p>Translate each counterfactual to a reason code: "If this customer had 3 more Builder sessions in the next 30 days, P(conversion) would jump from 0.18 to 0.62." That's a CSM playbook, not just a model explanation.</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 14: Backtesting</div>
+  <h3>Add lift over baseline rules + CUPED variance reduction <span class="tag tag-change">Change</span></h3>
+  <ul>
+    <li><strong>Baseline rules to beat:</strong> highest MRR first, highest Builder sessions first, random selection, plan-tier-only rule. Your model must beat each of these on decile lift, not just AUC.</li>
+    <li><strong>CUPED</strong> (Controlled-experiment Using Pre-Experiment Data): use pre-period covariates to reduce variance in backtest comparisons. Standard in A/B test analysis at Microsoft/Netflix.</li>
+    <li><strong>Cluster stability:</strong> rerun clustering on monthly samples; measure Adjusted Rand Index across runs. ARI &lt; 0.6 means clusters are not stable enough to use as named segments.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 15: Reporting</div>
+  <h3>Add fairness audit to the executive summary <span class="tag tag-add">Add</span></h3>
+  <p>Use <code>fairlearn</code> to compute disparate impact ratios across plan tier, country, industry, and tenure. If the top decile of customers is &gt;50% concentrated in one country or plan tier, that's a finding the exec summary must surface, not bury.</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 16: Visual Outputs</div>
+  <h3>Add Monte Carlo histogram and survival curves <span class="tag tag-add">Add</span></h3>
+  <p>The plan lists 8 charts. Add two:</p>
+  <ul>
+    <li><strong>$21M Monte Carlo histogram</strong>: 10,000 simulation outcomes with P10/P50/P90 marked.</li>
+    <li><strong>Survival curves by segment</strong>: Kaplan-Meier curves for paid/free/trial &times; ecommerce/non. Shows why <code>12 &times; MRR</code> was wrong.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 17: BigQuery Writeback</div>
+  <h3>Add scoring metadata + model version columns <span class="tag tag-change">Change</span></h3>
+  <p>Add columns to the writeback table:</p>
+  <ul>
+    <li><code>model_version</code> (MLflow run ID)</li>
+    <li><code>feature_set_version</code> (hash of feature_definitions.yaml)</li>
+    <li><code>scoring_pipeline_version</code> (git commit hash)</li>
+    <li><code>data_snapshot_date</code> (max event date in training data)</li>
+  </ul>
+  <p>Without these, two months from now you can't reproduce or audit any score.</p>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 18: Execution Order</div>
+  <h3>Keep the sequence but add data gates between phases <span class="tag tag-change">Change</span></h3>
+  <p>Each <code>src/*.py</code> script should end with a Great Expectations validation suite. If the validation fails, the pipeline halts. No silent continuation.</p>
+<pre><code># At end of feature_engineering.py
+context = ge.get_context()
+result = context.run_checkpoint(checkpoint_name="customer_features_checkpoint")
+if not result["success"]:
+    raise RuntimeError("Feature validation failed. Halting pipeline.")</code></pre>
+</div>
+
+<div class="phase">
+  <div class="label">Phase 19: Acceptance Criteria</div>
+  <h3>Add MLOps and validation artifacts to the criteria <span class="tag tag-change">Change</span></h3>
+  <p>Extend the acceptance list with:</p>
+  <ul>
+    <li>MLflow experiment with all model runs logged (hyperparameters, metrics, artifacts)</li>
+    <li>Great Expectations suite passing on all input tables</li>
+    <li>Feature definitions YAML versioned with git commit</li>
+    <li>Monte Carlo $21M projection with P10/P50/P90</li>
+    <li>Fairness audit report (disparate impact ratios)</li>
+    <li>Survival curves for retention valuation</li>
+    <li>Counterfactual explanations for top 100 customers</li>
+    <li>Confidence discount formula documented in technical appendix</li>
+  </ul>
+</div>
+
+<div class="callout">
+  <strong>Summary of changes:</strong> 1 new phase (MLOps Foundation), 13 modified phases, 5 phases with explicit new additions. Total: 19 improvements across the plan. The high-impact phases (8, 9, 10, 11, 12) are where most of the analytical rigor lives. The MLOps additions (Phase -1, Phase 0, Phase 17, Phase 18) are what make the work defensible and reproducible.
+</div>
+
+<p style="font-size: 8pt; color: #888; margin-top: 16px;">Next: see <a href="github-repos.html">GitHub Repos</a> for the curated open-source tools that implement these improvements without inventing new infrastructure.</p>
+
+</body>
+</html>

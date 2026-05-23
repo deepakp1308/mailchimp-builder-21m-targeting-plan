@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Evaluation &mdash; Strengths, Gaps, and Risks</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; background: #fff; line-height: 1.4; padding: 24px 32px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 16pt; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 12pt; font-weight: 700; margin-bottom: 8px; margin-top: 24px; border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+  h3 { font-size: 10pt; font-weight: 700; margin-bottom: 6px; margin-top: 12px; }
+  p { margin-bottom: 8px; }
+  .subtitle { font-size: 10pt; color: #555; font-style: italic; margin-bottom: 16px; }
+
+  .nav { margin-bottom: 16px; padding: 8px 0; border-bottom: 2px solid #1a3a5c; }
+  .nav a { font-size: 9pt; font-weight: 700; color: #1a3a5c; text-decoration: none; margin-right: 20px; }
+  .nav a.active { border-bottom: 2px solid #1a3a5c; padding-bottom: 4px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 8px 0 16px 0; }
+  th, td { border: 1px solid #bfbfbf; padding: 6px 10px; vertical-align: top; text-align: left; }
+  th { background: #1a3a5c; color: #fff; font-weight: 700; }
+  .crit { background: #FEE2E2; font-weight: 700; color: #991B1B; text-align: center; }
+  .high { background: #FEF3C7; font-weight: 700; color: #92400E; text-align: center; }
+  .med { background: #DBEAFE; font-weight: 700; color: #1E40AF; text-align: center; }
+  code { font-family: Consolas, monospace; background: #f5f5f5; padding: 1px 4px; border-radius: 2px; font-size: 8.5pt; }
+
+  .good-box { background: #f0fdf4; border-left: 4px solid #166534; padding: 10px 14px; margin: 8px 0; }
+  .gap-box { background: #FEF2F2; border-left: 4px solid #B91C1C; padding: 10px 14px; margin: 8px 0; }
+  .gap-box h3 { color: #991B1B; margin-top: 0; }
+  .gap-box .impact { font-size: 8pt; color: #555; margin-top: 4px; font-style: italic; }
+
+  ul { margin: 6px 0 6px 20px; }
+  ul li { margin-bottom: 4px; }
+
+  .callout { background: #FEF3C7; border: 1px solid #F59E0B; padding: 10px 14px; margin: 12px 0; font-size: 9pt; }
+
+  @media print { body { padding: 12px; font-size: 7.5pt; } }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="index.html">Overview</a>
+  <a href="evaluation.html" class="active">Evaluation</a>
+  <a href="improvements.html">Phase-by-Phase Improvements</a>
+  <a href="github-repos.html">GitHub Repos</a>
+  <a href="reliability-path.html">12-Week Reliability Path</a>
+</div>
+
+<h1>Evaluation: Strengths, Critical Gaps, and Risks</h1>
+<p class="subtitle">An honest read on what the Builder $21M Targeting Agent plan gets right, where it has holes, and which gaps put the $21M projection most at risk.</p>
+
+<h2>Strengths to Preserve (6 items)</h2>
+
+<p>The original plan's analytical philosophy is correct. These elements should be carried into v2 unchanged:</p>
+
+<div class="good-box">
+  <h3>1. Clustering as discovery, not prioritization</h3>
+  <p>The plan explicitly warns against "Cluster 4 has high engagement and high revenue, so target it." Final ranking comes from expected value calculation, not cluster membership. This is correct and uncommon &mdash; most analytics projects make this mistake.</p>
+</div>
+
+<div class="good-box">
+  <h3>2. Time-based train/test splits</h3>
+  <p>The plan rejects random splits as the primary validation approach: "Train on months 1-6, score customers at end of month 6, measure outcomes in months 7-9." This prevents leakage from future correlations contaminating training features.</p>
+</div>
+
+<div class="good-box">
+  <h3>3. Uplift modeling separate from propensity</h3>
+  <p>The plan correctly distinguishes "probability of conversion" (propensity) from "incremental probability if we intervene" (uplift). High-propensity customers may convert anyway; the uplift question is which customers would not have converted without intervention. This is the right framing.</p>
+</div>
+
+<div class="good-box">
+  <h3>4. Estimate quality labels</h3>
+  <p>Every estimate must be labeled as Validated, Directionally Supported, Assumption Based, or Insufficient Data. This kind of intellectual honesty survives finance scrutiny in a way that "the model says $21M" never does.</p>
+</div>
+
+<div class="good-box">
+  <h3>5. Privacy guardrails</h3>
+  <p>Hashed customer IDs only. No PII in outputs. No emails, names, phone numbers, addresses. This protects the work from compliance and Trust &amp; Safety issues that would otherwise surface during productionization.</p>
+</div>
+
+<div class="good-box">
+  <h3>6. Reason codes for every recommendation</h3>
+  <p>Every targeting decision comes with a plain-English explanation ("starts campaigns but fails to send; high MRR; recent Builder friction"). This is what makes the work usable by GTM, CSM, and sales teams, not just data scientists.</p>
+</div>
+
+<h2>Critical Gaps (15 items, ranked by impact on $21M defensibility)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Gap</th>
+      <th>Why It Matters</th>
+      <th style="width:110px;">$21M Risk</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>Revenue Phase 9 hardcodes <code>12 &times; MRR</code> for retention value</strong></td>
+      <td>Real customers churn at different rates. A 50% retention at month 12 means true value is 7&ndash;8 &times; MRR, not 12. Without survival analysis, you're systematically overstating retention revenue across the entire model.</td>
+      <td class="crit">CRITICAL<br>$5-8M swing</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Confidence discount in EV formula is undefined</strong></td>
+      <td>Phase 10 includes <code>confidence_discount</code> as a multiplier in <code>expected_value = eligibility &times; reachability &times; P(success) &times; uplift &times; revenue &times; confidence_discount</code> but never defines how it's calculated. Without a formula tied to sample size, treatment evidence, and model calibration, EV numbers can't be defended.</td>
+      <td class="crit">CRITICAL<br>Defensibility</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>No customer overlap handling in sequencing</strong></td>
+      <td>Phase 11 sequences initiatives by wave but doesn't address customers who are "best fit" for multiple initiatives. If customer X is in Wave 1 (initiative A) AND Wave 2 (initiative B), revenue gets double-counted. Without <code>argmax(EV)</code> per customer constraint, $21M is overstated 15-25%.</td>
+      <td class="crit">CRITICAL<br>$3-5M overstatement</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>No MLOps / experiment tracking</strong></td>
+      <td>10+ models, multiple validation windows, dozens of hyperparameter configurations. Without MLflow or equivalent, you cannot answer "which model version produced this score?" or "can we reproduce yesterday's result?" Data science review will reject this.</td>
+      <td class="crit">CRITICAL<br>Reproducibility</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>No data validation framework</strong></td>
+      <td>No Great Expectations, pandera, or dbt tests. If a feature column changes type, gets a sudden null spike, or drifts in distribution, the pipeline silently continues with broken assumptions. You need fail-fast data contracts.</td>
+      <td class="crit">CRITICAL<br>Silent corruption</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong>No Monte Carlo on $21M waterfall</strong></td>
+      <td>Phase 12 produces a single point estimate. Executives need P10/P50/P90 outcomes. Is $21M the median? The optimistic case? Without uncertainty quantification, you can't answer "how confident are we in $21M?" honestly.</td>
+      <td class="high">HIGH<br>Risk framing</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><strong>No fairness / bias audit</strong></td>
+      <td>Plan tier, country, industry, and tenure are correlated with model outcomes. Without disparate impact analysis, you may be targeting customers in ways that create regulatory or PR risk (e.g., systematically deprioritizing free-tier non-US users).</td>
+      <td class="high">HIGH<br>Compliance risk</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><strong>No hyperparameter optimization framework</strong></td>
+      <td>LightGBM and XGBoost have 10+ tunable hyperparameters. Without Optuna or equivalent Bayesian HPO, you're either accepting default performance (underfit) or doing manual grid search (slow and arbitrary).</td>
+      <td class="high">HIGH<br>Model quality</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><strong>Uplift modeling has no sample size guidance</strong></td>
+      <td>Phase 8 says "use uplift where treatment data supports it" but doesn't define "supports." Typical CATE estimates need n=500+ per treatment arm for stable estimates. Small treatment cohorts produce noisy uplift that looks rigorous but isn't.</td>
+      <td class="high">HIGH<br>False precision</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><strong>EV formula doesn't quantify dependency or trust risk</strong></td>
+      <td>The initiative config tracks <code>dependency_level</code> (low/med/high) and <code>customer_trust_risk</code> (low/med/high) but the EV formula doesn't multiply by these. A high-EV initiative with high engineering dependency may not ship in time to contribute to FY27.</td>
+      <td class="high">HIGH<br>Roadmap reality</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><strong>No feature store / lineage</strong></td>
+      <td>Features computed in BigQuery are not versioned. If a feature definition changes mid-project (e.g., "30-day Builder sessions" now uses a different event), historical scores become incomparable to new scores. Feast or even a hash-of-SQL approach is needed.</td>
+      <td class="med">MEDIUM<br>Versioning</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><strong>Wave 1-4 thresholds are qualitative</strong></td>
+      <td>The plan defines waves by adjective ("high expected value, high confidence") not by number. Without objective thresholds (e.g., "P(success) &ge; 0.6, confidence &ge; 0.7, EV &ge; $X"), wave assignment becomes subjective and unrepeatable.</td>
+      <td class="med">MEDIUM<br>Subjectivity</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><strong>Cluster naming relies on manual interpretation</strong></td>
+      <td>Phase 6 produces clusters but naming is left to "look at the centroid and write a description." This doesn't scale and isn't reproducible. A decision-tree-on-cluster-labels produces explicit if-then rules that explain what makes each cluster distinct.</td>
+      <td class="med">MEDIUM<br>Interpretability</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><strong>No model drift / data drift monitoring</strong></td>
+      <td>Once the scores are written to BigQuery (Phase 17), there's no plan for monitoring whether feature distributions drift over time. Models silently degrade. Evidently or equivalent would catch this.</td>
+      <td class="med">MEDIUM<br>Post-deploy</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><strong>No counterfactual explanations</strong></td>
+      <td>SHAP tells you which features mattered. It doesn't tell you "what would need to change for this customer to convert?" That's a counterfactual question (DiCE). For GTM activation, counterfactuals are more actionable than feature importance.</td>
+      <td class="med">MEDIUM<br>Actionability</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Top 5 Highest-Impact Fixes (Where to Start)</h2>
+
+<p>If you only have time for five improvements before reporting back, do these in order:</p>
+
+<div class="gap-box">
+  <h3>Fix 1: Replace <code>12 &times; MRR</code> with survival-based CLV</h3>
+  <p>Use <code>lifelines.KaplanMeierFitter</code> to compute survival curves by segment (paid tier, tenure, ecommerce flag, MRR band). For each segment, integrate under the survival curve to get expected retention months. Multiply by MRR to get expected retention value. For paid customers with 50% retention at month 12, expected value is roughly 8 &times; MRR, not 12 &times; MRR.</p>
+  <p class="impact">Impact: Could swing the $21M projection by $5-8M depending on actual retention curves. This is the single highest-leverage fix.</p>
+</div>
+
+<div class="gap-box">
+  <h3>Fix 2: Add MLflow + Great Expectations</h3>
+  <p>MLflow tracks every model run with its hyperparameters, training data, metrics, and artifacts. Great Expectations defines data contracts (e.g., "<code>current_mrr</code> must be non-null, &ge;0, and within 3 sigma of last week's distribution") and fails the pipeline if violated. Without these, the work is not reproducible or trustworthy.</p>
+  <p class="impact">Impact: Defensibility. Data science review will reject any model output that can't be reproduced or whose input data is unvalidated.</p>
+</div>
+
+<div class="gap-box">
+  <h3>Fix 3: Define confidence discount math explicitly</h3>
+  <p>Replace the undefined multiplier with: <code>confidence_discount = (sample_size_score &times; treatment_evidence_score &times; calibration_score)^(1/3)</code> where each component is in [0,1]. See the <a href="improvements.html">Improvements page</a> for the full formula.</p>
+  <p class="impact">Impact: Credibility. Without a written formula, the confidence discount becomes "whatever produces a defensible-looking number" &mdash; the opposite of rigor.</p>
+</div>
+
+<div class="gap-box">
+  <h3>Fix 4: Add Monte Carlo to the $21M waterfall</h3>
+  <p>For each customer's EV, sample from a distribution over (P(success), uplift, revenue) rather than using point estimates. Run 10,000 iterations. Report P10/P50/P90 of the aggregated $21M projection. This produces a confidence band: "We project $14M-$24M with 80% confidence, median $19M" rather than "We project $21M."</p>
+  <p class="impact">Impact: Risk framing. Executives can make better decisions when they know the realistic range, not just the central estimate.</p>
+</div>
+
+<div class="gap-box">
+  <h3>Fix 5: Handle customer overlap in sequencing</h3>
+  <p>Add an assignment constraint to Phase 11: each customer is assigned to at most one initiative across all waves. The optimization is <code>maximize sum(EV_ci &times; x_ci)</code> subject to <code>sum_i(x_ci) &le; 1</code> for all customers c. Without this, the same customer's revenue is counted multiple times across waves.</p>
+  <p class="impact">Impact: Could overstate $21M by 15-25%. This is a "math error" that becomes obvious in scrutiny.</p>
+</div>
+
+<h2>Hidden Risks (Things Not in the Plan But Should Be)</h2>
+
+<ul>
+  <li><strong>Survivorship bias in historical CLV.</strong> If retention curves are computed only on customers who are still in the dataset, you're systematically excluding the customers who churned. Use cohort-based survival from the original cohort, not the surviving population.</li>
+  <li><strong>SUTVA violation in uplift modeling.</strong> The Stable Unit Treatment Value Assumption says one customer's treatment doesn't affect another's outcome. In Mailchimp, if Builder improvements ship to all users (not just treatment group), historical "treatment vs. control" comparisons may not be valid. Watch for cross-contamination.</li>
+  <li><strong>Goodhart's Law on activation metrics.</strong> If "campaign sent in 30 days" becomes the optimization target, the model may target customers whose first send was inevitable (high propensity, low uplift). This is why uplift modeling matters.</li>
+  <li><strong>Concept drift in 2026.</strong> Klaviyo shipped Universal Content Spring 2026. Mailchimp's Builder behavior may shift as customers compare. Historical features may not predict future behavior the same way. Plan to retrain frequently.</li>
+  <li><strong>The "easy first" trap.</strong> Wave 1 may be customers with high propensity AND high uplift, but those may also be the smallest cohort. Wave 4 ("strategic learning value") may actually be where $21M is hiding. Don't anchor on Wave 1 size as the indicator of success.</li>
+</ul>
+
+<div class="callout">
+  <strong>Net assessment:</strong> The plan's analytical philosophy is sound. The execution details have 15 critical gaps that need to be filled before the $21M number can be defended. The top 5 fixes address the most material issues: survival-based CLV (Fix 1), MLOps foundation (Fix 2), defined confidence math (Fix 3), Monte Carlo uncertainty (Fix 4), and overlap handling (Fix 5). Together they change the deliverable from "ambitious analytical project" to "defensible $21M business case."
+</div>
+
+<p style="font-size: 8pt; color: #888; margin-top: 16px;">See <a href="improvements.html">Phase-by-Phase Improvements</a> for specific changes mapped to each of the 19 phases in the original plan, and <a href="github-repos.html">GitHub Repos</a> for the curated open-source tools that close these gaps.</p>
+
+</body>
+</html>
