@@ -7,62 +7,69 @@
 
 ## Executive Summary
 
-Revenue impact range: **$21.3M (P10) — $21.3M (P50) — $21.4M (P90)**
+Revenue impact range: **$20.1M (P10) — $20.1M (P50) — $20.1M (P90)**
 
-**Can we hit $21M? Yes** — the median Monte Carlo estimate exceeds the target with 100% probability.
+**Can we hit $21M? Challenging** — the median Monte Carlo estimate falls below target. Achieving $21M requires higher-than-base uplift rates, validated through experiments.
 
 ## Key Numbers
 
 | Metric | Value |
 |--------|-------|
-| Customers analyzed | 50,000 |
-| Total MRR | $33.5M |
-| Customers with initiatives | 50,000 (100%) |
-| Customer segments | 11 |
+| Customers analyzed | 1,651,592 |
+| Total MRR | $108.1M |
+| Customers with initiatives | 1,651,592 (100%) |
+| Customer segments | 13 |
 | Propensity models | 5 |
 | Monte Carlo iterations | 10,000 |
-| P(hitting $21M) | 100% |
+| P(hitting $21M) | 0% |
 
 ## Wave Sequence
 
-### Wave 1 — $20.2M EV, 29,819 customers
+### Wave 1 — $18.1M EV, 549,557 customers
 
 | Initiative | Customers | EV (Base) | P(Success) | Confidence |
 |-----------|-----------|-----------|------------|------------|
-| Universal Content | 29,819 | $20,204,623 | 100% | 0.75 |
+| Code Mode | 10,399 | $342,700 | 99% | 0.75 |
+| Universal Content | 539,158 | $17,723,331 | 100% | 0.75 |
 
-### Wave 3 — $1.1M EV, 5,680 customers
-
-| Initiative | Customers | EV (Base) | P(Success) | Confidence |
-|-----------|-----------|-----------|------------|------------|
-| Activation | 3,237 | $86 | 0% | 0.75 |
-| Ai Builder | 1,332 | $561,997 | 49% | 0.75 |
-| Brandkit | 3 | $1,138 | 68% | 0.75 |
-| Code Mode | 661 | $345,368 | 99% | 0.75 |
-| Omnichannel | 21 | $3 | 56% | 0.75 |
-| Template Improvement | 426 | $217,700 | 99% | 0.75 |
-
-### Wave 4 — $0.0M EV, 14,501 customers
+### Wave 2 — $2.0M EV, 181,480 customers
 
 | Initiative | Customers | EV (Base) | P(Success) | Confidence |
 |-----------|-----------|-----------|------------|------------|
-| Rendering Fix | 14,501 | $2,286 | 77% | 0.75 |
+| Ai Builder | 139,062 | $1,496,803 | 74% | 0.75 |
+| Brandkit | 628 | $4,687 | 82% | 0.75 |
+| Omnichannel | 3,339 | $9 | 42% | 0.75 |
+| Template Improvement | 38,451 | $507,438 | 100% | 0.75 |
+
+### Wave 3 — $0.0M EV, 263,090 customers
+
+| Initiative | Customers | EV (Base) | P(Success) | Confidence |
+|-----------|-----------|-----------|------------|------------|
+| Activation | 263,090 | $181 | 0% | 0.75 |
+
+### Wave 4 — $0.0M EV, 657,465 customers
+
+| Initiative | Customers | EV (Base) | P(Success) | Confidence |
+|-----------|-----------|-----------|------------|------------|
+| Rendering Fix | 657,465 | $4,470 | 49% | 0.75 |
 
 ## Customer Segments
 
 | Segment | Count | Avg MRR | Completion | Friction | Churn |
 |---------|-------|---------|------------|----------|-------|
-| Power senders | 8,209 | $438 | 80% | 0.08 | 0.0% |
-| Power senders | 1,036 | $1009 | 75% | 0.10 | 0.0% |
-| High-value frustrated users | 7,264 | $490 | 0% | 0.52 | 0.0% |
-| Cluster 3: high creates_trend, high publishes_trend | 5,364 | $505 | 38% | 0.25 | 0.0% |
-| Power senders | 1,800 | $1510 | 76% | 0.10 | 0.0% |
-| Power senders | 4,938 | $1671 | 74% | 0.10 | 0.0% |
-| Power senders | 6,614 | $708 | 79% | 0.09 | 0.0% |
-| Power senders | 590 | $879 | 71% | 0.12 | 0.0% |
-| Power senders | 12,247 | $271 | 84% | 0.06 | 0.0% |
-| Power senders | 772 | $1774 | 74% | 0.10 | 0.0% |
-| Power senders | 1,166 | $1451 | 74% | 0.10 | 0.0% |
+| Dormant paid users at retention risk | 149,322 | $61 | 0% | 0.41 | 0.0% |
+| Active mid-market users | 277,782 | $33 | 93% | 0.03 | 0.0% |
+| Active mid-market users | 37,079 | $676 | 64% | 0.15 | 0.0% |
+| Power senders | 104,424 | $88 | 76% | 0.10 | 0.0% |
+| Active mid-market users | 195,805 | $39 | 43% | 0.23 | 0.0% |
+| Power senders | 33,836 | $433 | 80% | 0.08 | 0.0% |
+| Active mid-market users | 254,185 | $45 | 83% | 0.07 | 0.0% |
+| Dormant paid users at retention risk | 345,413 | $20 | 0% | 0.40 | 0.0% |
+| Cluster 8: low creates_trend, high email_tests_90d | 23,196 | $73 | 33% | 0.36 | 0.0% |
+| Cluster 9: high creates_trend, high friction_score | 132,430 | $13 | 0% | 0.75 | 0.0% |
+| Power senders | 4,573 | $561 | 72% | 0.11 | 0.0% |
+| Power senders | 73,135 | $94 | 75% | 0.10 | 0.0% |
+| Power senders | 20,412 | $107 | 72% | 0.12 | 0.0% |
 
 ## Key Assumptions & Risks
 

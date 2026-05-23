@@ -25,8 +25,13 @@ print("=" * 60)
 print("Loading feature table...")
 df = pd.read_parquet("data/customers_engineered.parquet")
 df = df.drop_duplicates(subset="user_id", keep="first")
+is_full_population = (
+    'data_source' in df.columns
+    and (df['data_source'] == 'bigquery_full_population').any()
+)
 print(f"Loaded {len(df):,} customers with {len(df.columns)} features")
-print(f"Sample avg MRR: ${df['avg_mrr'].mean():.2f} | Paid avg MRR (population): ${POP_AVG_MRR_PAID:.2f}")
+print(f"Data scope: {'FULL POPULATION' if is_full_population else 'SAMPLE'}")
+print(f"Avg MRR: ${df['avg_mrr'].mean():.2f}")
 
 # ═══════════════════════════════════════════════════════════
 # PHASE 2: DESCRIPTIVE SEGMENTATION
@@ -366,15 +371,23 @@ df['reason_codes'] = df.apply(reason_code, axis=1)
 total_ev_sample = df['best_ev_annualized'].sum()
 paid_mask = df['primary_plan_type'].isin(['monthly', 'payg'])
 n_paid_sample = paid_mask.sum()
-paid_sample_mrr = df.loc[paid_mask, 'avg_mrr'].mean() if n_paid_sample else 1
-mrr_calibration = POP_AVG_MRR_PAID / max(paid_sample_mrr, 1)
-# Extrapolate from paid sample to paid population (avoid double-scaling free cohort)
-total_ev = (total_ev_sample / max(n_paid_sample, 1)) * POP_PAID_SIZE * mrr_calibration * FY27_REALIZATION_RATE
-calibration_factor = (POP_PAID_SIZE / max(n_paid_sample, 1)) * mrr_calibration * FY27_REALIZATION_RATE
-population_scale = POP_PAID_SIZE / max(n_paid_sample, 1)
-print(f"\n  Sample EV (annualized): ${total_ev_sample/1e6:.1f}M")
-print(f"  Paid pop scale: {population_scale:.1f}x | MRR calibration: {mrr_calibration:.3f}x | FY27 realization: {FY27_REALIZATION_RATE:.0%}")
-print(f"  Calibrated FY27 EV: ${total_ev/1e6:.1f}M")
+if is_full_population:
+    # All eligible customers — only apply FY27 rollout realization cap
+    total_ev = total_ev_sample * FY27_REALIZATION_RATE
+    calibration_factor = FY27_REALIZATION_RATE
+    population_scale = 1.0
+    mrr_calibration = 1.0
+    print(f"\n  Full-population EV (annualized): ${total_ev_sample/1e6:.1f}M")
+    print(f"  FY27 realization ({FY27_REALIZATION_RATE:.0%}): ${total_ev/1e6:.1f}M")
+else:
+    paid_sample_mrr = df.loc[paid_mask, 'avg_mrr'].mean() if n_paid_sample else 1
+    mrr_calibration = POP_AVG_MRR_PAID / max(paid_sample_mrr, 1)
+    total_ev = (total_ev_sample / max(n_paid_sample, 1)) * POP_PAID_SIZE * mrr_calibration * FY27_REALIZATION_RATE
+    calibration_factor = (POP_PAID_SIZE / max(n_paid_sample, 1)) * mrr_calibration * FY27_REALIZATION_RATE
+    population_scale = POP_PAID_SIZE / max(n_paid_sample, 1)
+    print(f"\n  Sample EV (annualized): ${total_ev_sample/1e6:.1f}M")
+    print(f"  Paid pop scale: {population_scale:.1f}x | MRR calibration: {mrr_calibration:.3f}x | FY27 realization: {FY27_REALIZATION_RATE:.0%}")
+    print(f"  Calibrated FY27 EV: ${total_ev/1e6:.1f}M")
 
 # ═══════════════════════════════════════════════════════════
 # PHASE 5: MONTE CARLO + SEQUENCING
@@ -515,6 +528,7 @@ key_numbers = {
     'target': 21000000,
     'gap': float(21e6 - total_ev),
     'data_source': df['data_source'].iloc[0] if 'data_source' in df.columns else 'unknown',
+    'is_full_population': is_full_population,
     'waves': wave_summary,
     'initiative_counts': df['best_initiative'].value_counts().to_dict(),
     'cluster_summary': [{

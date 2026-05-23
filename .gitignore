@@ -8,5 +8,6 @@ build/
 
 # Large generated files (regenerate by running the pipeline)
 data/customers_engineered.parquet
+data/raw_full/
 outputs/customer_scores.csv
 outputs/mc_iterations.npy

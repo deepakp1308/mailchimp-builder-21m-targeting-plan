@@ -1,150 +1,165 @@
 {
-  "total_customers": 50000,
+  "total_customers": 1651592,
   "population_size": 1651596,
-  "paid_customers": 34766,
-  "free_customers": 15000,
-  "total_ev_annualized": 21333201.39900348,
-  "sample_ev_annualized": 43207704.624540225,
+  "paid_customers": 989658,
+  "free_customers": 659485,
+  "total_ev_annualized": 20079619.00001076,
+  "sample_ev_annualized": 125497618.75006723,
   "fy27_realization_rate": 0.16,
-  "monte_carlo_p10": 21273793.350225877,
-  "monte_carlo_p50": 21340377.50467702,
-  "monte_carlo_p90": 21407559.27356768,
+  "monte_carlo_p10": 20061382.899799135,
+  "monte_carlo_p50": 20086368.919861827,
+  "monte_carlo_p90": 20111411.46809446,
   "target": 21000000,
-  "gap": -333201.39900347963,
-  "data_source": "bigquery_batched_sample",
+  "gap": 920380.9999892414,
+  "data_source": "bigquery_full_population",
+  "is_full_population": "True",
   "waves": [
     {
       "wave": 1,
-      "customer_count": 12350,
-      "total_mrr": 19087798.867222108,
-      "expected_revenue": 13481146.501891034,
-      "cumulative_revenue": 13481146.501891034,
-      "avg_ev": 2210.8792956839884,
+      "customer_count": 401569,
+      "total_mrr": 81153382.47027156,
+      "expected_revenue": 18204594.68112361,
+      "cumulative_revenue": 18204594.68112361,
+      "avg_ev": 283.3354087517278,
       "top_initiative": "universal_content",
-      "pct_paid": 0.9860728744939271,
-      "avg_friction": 0.10453516829458341
+      "pct_paid": 0.969195829359338,
+      "avg_friction": 0.1054252496204093
     },
     {
       "wave": 2,
-      "customer_count": 12650,
-      "total_mrr": 8186985.041666436,
-      "expected_revenue": 5653322.597910068,
-      "cumulative_revenue": 19134469.0998011,
-      "avg_ev": 905.1455173584203,
+      "customer_count": 331174,
+      "total_mrr": 9879826.426667014,
+      "expected_revenue": 1874862.1688610434,
+      "cumulative_revenue": 20079456.849984653,
+      "avg_ev": 35.382875936460955,
       "top_initiative": "universal_content",
-      "pct_paid": 0.9940711462450593,
-      "avg_friction": 0.12345018554030464
+      "pct_paid": 0.9693756152354955,
+      "avg_friction": 0.178658597469178
     },
     {
       "wave": 3,
-      "customer_count": 10521,
-      "total_mrr": 6182168.406666625,
-      "expected_revenue": 2198732.299202374,
-      "cumulative_revenue": 21333201.399003476,
-      "avg_ev": 423.2729330157731,
-      "top_initiative": "universal_content",
-      "pct_paid": 0.9517156163862751,
-      "avg_friction": 0.22097029105895163
+      "customer_count": 263105,
+      "total_mrr": 17111564.979444895,
+      "expected_revenue": 162.15002610574516,
+      "cumulative_revenue": 20079619.00001076,
+      "avg_ev": 0.00385183733931665,
+      "top_initiative": "activation",
+      "pct_paid": 0.9632238079854051,
+      "avg_friction": 0.40017407498907287
     },
     {
       "wave": 4,
-      "customer_count": 14479,
+      "customer_count": 655744,
       "total_mrr": 0.0,
       "expected_revenue": 0.0,
-      "cumulative_revenue": 21333201.399003476,
+      "cumulative_revenue": 20079619.00001076,
       "avg_ev": 0.0,
       "top_initiative": "rendering_fix",
-      "pct_paid": 0.0,
-      "avg_friction": 0.20568684726172964
+      "pct_paid": 0.03964656939293383,
+      "avg_friction": 0.3032742547170339
     }
   ],
   "initiative_counts": {
-    "universal_content": 29819,
-    "rendering_fix": 14501,
-    "activation": 3237,
-    "ai_builder": 1332,
-    "code_mode": 661,
-    "template_improvement": 426,
-    "omnichannel": 21,
-    "brandkit": 3
+    "rendering_fix": 657465,
+    "universal_content": 539158,
+    "activation": 263090,
+    "ai_builder": 139062,
+    "template_improvement": 38451,
+    "code_mode": 10399,
+    "omnichannel": 3339,
+    "brandkit": 628
   },
   "cluster_summary": [
     {
-      "name": "Power senders",
-      "count": 8209,
-      "avg_mrr": 438.05245157753575,
-      "avg_friction": 0.07809525696034784,
-      "avg_completion": 0.8047618575991303
+      "name": "Dormant paid users at retention risk",
+      "count": 149322,
+      "avg_mrr": 61.43827615451716,
+      "avg_friction": 0.4148986106177611,
+      "avg_completion": 0.0001625625382506485
+    },
+    {
+      "name": "Active mid-market users",
+      "count": 277782,
+      "avg_mrr": 32.89068059115439,
+      "avg_friction": 0.028165785443587107,
+      "avg_completion": 0.9295855363910323
+    },
+    {
+      "name": "Active mid-market users",
+      "count": 37079,
+      "avg_mrr": 675.917053138771,
+      "avg_friction": 0.15123582814557038,
+      "avg_completion": 0.6403575290724127
     },
     {
       "name": "Power senders",
-      "count": 1036,
-      "avg_mrr": 1009.0448825611168,
-      "avg_friction": 0.10047041996385728,
-      "avg_completion": 0.7488239500903568
+      "count": 104424,
+      "avg_mrr": 87.98845503533974,
+      "avg_friction": 0.09537564665530157,
+      "avg_completion": 0.7623437493695604
     },
     {
-      "name": "High-value frustrated users",
-      "count": 7264,
-      "avg_mrr": 489.69743994356014,
-      "avg_friction": 0.5174146475770925,
+      "name": "Active mid-market users",
+      "count": 195805,
+      "avg_mrr": 38.83617742070361,
+      "avg_friction": 0.22601066434397168,
+      "avg_completion": 0.4349733391400709
+    },
+    {
+      "name": "Power senders",
+      "count": 33836,
+      "avg_mrr": 432.75415254624886,
+      "avg_friction": 0.08041415359438195,
+      "avg_completion": 0.79974041693614
+    },
+    {
+      "name": "Active mid-market users",
+      "count": 254185,
+      "avg_mrr": 45.34756684762918,
+      "avg_friction": 0.06876402184610866,
+      "avg_completion": 0.8280899453847282
+    },
+    {
+      "name": "Dormant paid users at retention risk",
+      "count": 345413,
+      "avg_mrr": 19.713907071631454,
+      "avg_friction": 0.4001493863867312,
       "avg_completion": 0.0
     },
     {
-      "name": "Cluster 3: high creates_trend, high publishes_trend",
-      "count": 5364,
-      "avg_mrr": 504.6536744189583,
-      "avg_friction": 0.2517788197325374,
-      "avg_completion": 0.3792218544717886
+      "name": "Cluster 8: low creates_trend, high email_tests_90d",
+      "count": 23196,
+      "avg_mrr": 72.82718635635945,
+      "avg_friction": 0.3643307944863107,
+      "avg_completion": 0.32895573494304375
+    },
+    {
+      "name": "Cluster 9: high creates_trend, high friction_score",
+      "count": 132430,
+      "avg_mrr": 12.704127400639123,
+      "avg_friction": 0.7470195575020765,
+      "avg_completion": 0.0
     },
     {
       "name": "Power senders",
-      "count": 1800,
-      "avg_mrr": 1510.1958191357894,
-      "avg_friction": 0.09713262752127583,
-      "avg_completion": 0.7571684311968104
+      "count": 4573,
+      "avg_mrr": 560.9556604587093,
+      "avg_friction": 0.1107081967438666,
+      "avg_completion": 0.7245415571234955
     },
     {
       "name": "Power senders",
-      "count": 4938,
-      "avg_mrr": 1670.6955783380401,
-      "avg_friction": 0.10261048410539159,
-      "avg_completion": 0.7443850898580279
+      "count": 73135,
+      "avg_mrr": 94.08448020402685,
+      "avg_friction": 0.10097114675195142,
+      "avg_completion": 0.7483822787412331
     },
     {
       "name": "Power senders",
-      "count": 6614,
-      "avg_mrr": 707.653877801282,
-      "avg_friction": 0.08551199356336761,
-      "avg_completion": 0.786220016091581
-    },
-    {
-      "name": "Power senders",
-      "count": 590,
-      "avg_mrr": 879.1372146892559,
-      "avg_friction": 0.11868044563110285,
-      "avg_completion": 0.7096548181256327
-    },
-    {
-      "name": "Power senders",
-      "count": 12247,
-      "avg_mrr": 271.29020590075567,
-      "avg_friction": 0.06406884888559321,
-      "avg_completion": 0.8398278777860171
-    },
-    {
-      "name": "Power senders",
-      "count": 772,
-      "avg_mrr": 1773.780555915359,
-      "avg_friction": 0.10221324098661115,
-      "avg_completion": 0.7444668975334722
-    },
-    {
-      "name": "Power senders",
-      "count": 1166,
-      "avg_mrr": 1451.3499514008001,
-      "avg_friction": 0.103535727269882,
-      "avg_completion": 0.742447131224952
+      "count": 20412,
+      "avg_mrr": 106.94149212336141,
+      "avg_friction": 0.11639937914861855,
+      "avg_completion": 0.7164236567727805
     }
   ]
 }

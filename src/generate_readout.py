@@ -91,15 +91,23 @@ wf_html = pio.to_html(fig_wf, include_plotlyjs=False, full_html=False)
 
 # --- Build HTML ---
 today = datetime.now().strftime("%B %d, %Y")
-is_synthetic = 'data_source' not in df.columns or df['data_source'].iloc[0] != 'bigquery_batched_sample'
-
+is_synthetic = True
+is_full_population = False
 try:
     with open(os.path.join(OUT_DIR, "key_numbers.json")) as f:
         key_numbers = json.load(f)
-    if key_numbers.get('data_source') == 'bigquery_batched_sample':
+    src = key_numbers.get('data_source', '')
+    if src in ('bigquery_batched_sample', 'bigquery_full_population'):
         is_synthetic = False
+    is_full_population = src == 'bigquery_full_population' or key_numbers.get('is_full_population', False)
 except FileNotFoundError:
     key_numbers = {}
+if 'data_source' in df.columns:
+    if (df['data_source'] == 'bigquery_full_population').any():
+        is_synthetic = False
+        is_full_population = True
+    elif (df['data_source'] == 'bigquery_batched_sample').any():
+        is_synthetic = False
 
 total_customers = len(df)
 total_mrr = df['avg_mrr'].sum()
@@ -255,12 +263,16 @@ for _, s in w1_seg_agg.iterrows():
     </tr>"""
 
 
-DATA_NOTE = """<p><strong style="color:#2E86AB">✓ PRODUCTION DATA (BATCHED SAMPLE)</strong> — 
-This analysis uses a stratified 50K customer sample from BigQuery (35K top paid + 15K active free), 
-with population calibration applied to MRR and customer counts. Sample skews toward high-MRR paid accounts; 
-segment rankings and initiative priorities are directional. Validate uplift assumptions via experiments before final investment decisions.</p>""" if not is_synthetic else """<p><strong style="color:#E63946">⚠ SYNTHETIC DATA</strong> — 
-This analysis uses a synthetic dataset calibrated to known Mailchimp metrics. 
-Results should be validated against production BigQuery data before executive presentation.</p>"""
+if is_full_population:
+    DATA_NOTE = """<p><strong style="color:#2E86AB">✓ PRODUCTION DATA (FULL POPULATION)</strong> — 
+All eligible customers from BigQuery (~1.65M: paid + active free in last 90 days). 
+FY27 revenue applies a 16% realization factor for phased rollout capacity. Validate uplift assumptions via experiments.</p>"""
+elif not is_synthetic:
+    DATA_NOTE = """<p><strong style="color:#2E86AB">✓ PRODUCTION DATA (BATCHED SAMPLE)</strong> — 
+Stratified 50K customer sample from BigQuery with population calibration. Validate uplift assumptions via experiments.</p>"""
+else:
+    DATA_NOTE = """<p><strong style="color:#E63946">⚠ SYNTHETIC DATA</strong> — 
+Synthetic dataset calibrated to known Mailchimp metrics. Validate against production BigQuery before executive presentation.</p>"""
 
 html = f"""<!DOCTYPE html>
 <html lang="en">
