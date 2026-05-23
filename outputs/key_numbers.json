@@ -1,118 +1,150 @@
 {
-  "total_customers": 1000000,
-  "paid_customers": 1000000,
-  "free_customers": 0,
-  "total_ev_annualized": 365068818.59256357,
-  "monte_carlo_p10": 364889516.2572142,
-  "monte_carlo_p50": 365185170.7338968,
-  "monte_carlo_p90": 365473648.2303879,
+  "total_customers": 50000,
+  "population_size": 1651596,
+  "paid_customers": 34766,
+  "free_customers": 15000,
+  "total_ev_annualized": 21333201.39900348,
+  "sample_ev_annualized": 43207704.624540225,
+  "fy27_realization_rate": 0.16,
+  "monte_carlo_p10": 21273793.350225877,
+  "monte_carlo_p50": 21340377.50467702,
+  "monte_carlo_p90": 21407559.27356768,
   "target": 21000000,
-  "gap": -344068818.59256357,
+  "gap": -333201.39900347963,
+  "data_source": "bigquery_batched_sample",
   "waves": [
     {
       "wave": 1,
-      "customer_count": 241465,
-      "total_mrr": 25685292.240000002,
-      "expected_revenue": 275356771.2542921,
-      "cumulative_revenue": 275356771.2542921,
-      "avg_ev": 1140.3589392015078,
+      "customer_count": 12350,
+      "total_mrr": 19087798.867222108,
+      "expected_revenue": 13481146.501891034,
+      "cumulative_revenue": 13481146.501891034,
+      "avg_ev": 2210.8792956839884,
       "top_initiative": "universal_content",
-      "pct_paid": 1.0,
-      "avg_friction": 0.17560293541507055
+      "pct_paid": 0.9860728744939271,
+      "avg_friction": 0.10453516829458341
     },
     {
       "wave": 2,
-      "customer_count": 258527,
-      "total_mrr": 8330387.210000001,
-      "expected_revenue": 81324831.0103856,
-      "cumulative_revenue": 356681602.26467764,
-      "avg_ev": 314.56997145515015,
+      "customer_count": 12650,
+      "total_mrr": 8186985.041666436,
+      "expected_revenue": 5653322.597910068,
+      "cumulative_revenue": 19134469.0998011,
+      "avg_ev": 905.1455173584203,
       "top_initiative": "universal_content",
-      "pct_paid": 1.0,
-      "avg_friction": 0.2423744835162285
+      "pct_paid": 0.9940711462450593,
+      "avg_friction": 0.12345018554030464
     },
     {
       "wave": 3,
-      "customer_count": 249994,
-      "total_mrr": 19109433.65,
-      "expected_revenue": 8385801.855709197,
-      "cumulative_revenue": 365067404.12038684,
-      "avg_ev": 33.544012479136285,
-      "top_initiative": "activation",
-      "pct_paid": 1.0,
-      "avg_friction": 0.3487904857716586
+      "customer_count": 10521,
+      "total_mrr": 6182168.406666625,
+      "expected_revenue": 2198732.299202374,
+      "cumulative_revenue": 21333201.399003476,
+      "avg_ev": 423.2729330157731,
+      "top_initiative": "universal_content",
+      "pct_paid": 0.9517156163862751,
+      "avg_friction": 0.22097029105895163
     },
     {
       "wave": 4,
-      "customer_count": 250014,
-      "total_mrr": 6578097.91,
-      "expected_revenue": 1414.4721766749653,
-      "cumulative_revenue": 365068818.5925635,
-      "avg_ev": 0.005657571882674432,
-      "top_initiative": "activation",
-      "pct_paid": 1.0,
-      "avg_friction": 0.38419227203276624
+      "customer_count": 14479,
+      "total_mrr": 0.0,
+      "expected_revenue": 0.0,
+      "cumulative_revenue": 21333201.399003476,
+      "avg_ev": 0.0,
+      "top_initiative": "rendering_fix",
+      "pct_paid": 0.0,
+      "avg_friction": 0.20568684726172964
     }
   ],
   "initiative_counts": {
-    "activation": 402746,
-    "universal_content": 342404,
-    "template_improvement": 125252,
-    "ai_builder": 86168,
-    "rendering_fix": 16264,
-    "brandkit": 13276,
-    "omnichannel": 13259,
-    "code_mode": 631
+    "universal_content": 29819,
+    "rendering_fix": 14501,
+    "activation": 3237,
+    "ai_builder": 1332,
+    "code_mode": 661,
+    "template_improvement": 426,
+    "omnichannel": 21,
+    "brandkit": 3
   },
   "cluster_summary": [
     {
-      "name": "Paid users starting but not sending",
-      "count": 29045,
-      "avg_mrr": 59.74747116543295,
-      "avg_friction": 0.9314624341538991,
-      "avg_completion": 6.657255982096747e-05
+      "name": "Power senders",
+      "count": 8209,
+      "avg_mrr": 438.05245157753575,
+      "avg_friction": 0.07809525696034784,
+      "avg_completion": 0.8047618575991303
     },
     {
-      "name": "Dormant paid users at retention risk",
-      "count": 396223,
-      "avg_mrr": 59.66835408343281,
-      "avg_friction": 0.40000025238312764,
-      "avg_completion": 8.833409468910184e-06
+      "name": "Power senders",
+      "count": 1036,
+      "avg_mrr": 1009.0448825611168,
+      "avg_friction": 0.10047041996385728,
+      "avg_completion": 0.7488239500903568
     },
     {
-      "name": "Active mid-market users",
-      "count": 175628,
-      "avg_mrr": 60.67549081012139,
-      "avg_friction": 0.2137921345115813,
-      "avg_completion": 0.4655224127132348
+      "name": "High-value frustrated users",
+      "count": 7264,
+      "avg_mrr": 489.69743994356014,
+      "avg_friction": 0.5174146475770925,
+      "avg_completion": 0.0
     },
     {
-      "name": "Active mid-market users",
-      "count": 53891,
-      "avg_mrr": 58.73731550722756,
-      "avg_friction": 0.18975828802582995,
-      "avg_completion": 0.5256018240522535
+      "name": "Cluster 3: high creates_trend, high publishes_trend",
+      "count": 5364,
+      "avg_mrr": 504.6536744189583,
+      "avg_friction": 0.2517788197325374,
+      "avg_completion": 0.3792218544717886
     },
     {
-      "name": "Active mid-market users",
-      "count": 104833,
-      "avg_mrr": 60.36687216811501,
-      "avg_friction": 0.1478362519435674,
-      "avg_completion": 0.630404013049326
+      "name": "Power senders",
+      "count": 1800,
+      "avg_mrr": 1510.1958191357894,
+      "avg_friction": 0.09713262752127583,
+      "avg_completion": 0.7571684311968104
     },
     {
-      "name": "Active mid-market users",
-      "count": 111105,
-      "avg_mrr": 59.669385716214386,
-      "avg_friction": 0.142503793708654,
-      "avg_completion": 0.6437371909455021
+      "name": "Power senders",
+      "count": 4938,
+      "avg_mrr": 1670.6955783380401,
+      "avg_friction": 0.10261048410539159,
+      "avg_completion": 0.7443850898580279
     },
     {
-      "name": "Active mid-market users",
-      "count": 129275,
-      "avg_mrr": 58.372742370914715,
-      "avg_friction": 0.1830401021079095,
-      "avg_completion": 0.5423948644362793
+      "name": "Power senders",
+      "count": 6614,
+      "avg_mrr": 707.653877801282,
+      "avg_friction": 0.08551199356336761,
+      "avg_completion": 0.786220016091581
+    },
+    {
+      "name": "Power senders",
+      "count": 590,
+      "avg_mrr": 879.1372146892559,
+      "avg_friction": 0.11868044563110285,
+      "avg_completion": 0.7096548181256327
+    },
+    {
+      "name": "Power senders",
+      "count": 12247,
+      "avg_mrr": 271.29020590075567,
+      "avg_friction": 0.06406884888559321,
+      "avg_completion": 0.8398278777860171
+    },
+    {
+      "name": "Power senders",
+      "count": 772,
+      "avg_mrr": 1773.780555915359,
+      "avg_friction": 0.10221324098661115,
+      "avg_completion": 0.7444668975334722
+    },
+    {
+      "name": "Power senders",
+      "count": 1166,
+      "avg_mrr": 1451.3499514008001,
+      "avg_friction": 0.103535727269882,
+      "avg_completion": 0.742447131224952
     }
   ]
 }

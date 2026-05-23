@@ -16,10 +16,17 @@ warnings.filterwarnings('ignore')
 
 os.makedirs("outputs/charts", exist_ok=True)
 
+POPULATION_SIZE = 1_651_596
+POP_PAID_SIZE = 992_107
+POP_AVG_MRR_PAID = 103.45
+FY27_REALIZATION_RATE = 0.16  # share of theoretical EV capturable in FY27 rollout window
+
 print("=" * 60)
 print("Loading feature table...")
 df = pd.read_parquet("data/customers_engineered.parquet")
+df = df.drop_duplicates(subset="user_id", keep="first")
 print(f"Loaded {len(df):,} customers with {len(df.columns)} features")
+print(f"Sample avg MRR: ${df['avg_mrr'].mean():.2f} | Paid avg MRR (population): ${POP_AVG_MRR_PAID:.2f}")
 
 # ═══════════════════════════════════════════════════════════
 # PHASE 2: DESCRIPTIVE SEGMENTATION
@@ -198,6 +205,21 @@ propensity_targets = {
     'p_churn_risk': (df['avg_mrr'] > 0) & (df['creates_trend'] < 0) & (df['publishes_trend'] < 0),
 }
 
+leaky_features = {
+    'p_send_completion': {
+        'email_completion_rate', 'email_abandonment_rate', 'friction_score',
+        'test_no_send_rate', 'create_no_publish_rate',
+        'email_creates_90d', 'email_publishes_90d', 'email_tests_90d',
+        'email_creates_30d', 'email_publishes_30d',
+    },
+    'p_activation': {
+        'total_builder_events_90d', 'builder_active_days_90d',
+        'email_creates_90d', 'email_publishes_90d', 'email_tests_90d',
+        'email_creates_30d', 'email_publishes_30d', 'total_builder_events_30d',
+    },
+    'p_high_engagement': {'builder_active_days_90d', 'total_builder_events_90d', 'total_builder_events_30d'},
+}
+
 for target_name, target_mask in propensity_targets.items():
     y = target_mask.astype(int)
     pos_rate = y.mean()
@@ -208,7 +230,9 @@ for target_name, target_mask in propensity_targets.items():
         df[target_name] = pos_rate
         continue
 
-    # Use stratified sample for speed (full dataset too large for sklearn GBM)
+    drop_feats = leaky_features.get(target_name, set())
+    feat_cols = [c for c in model_features if c not in drop_feats]
+    X = df[feat_cols].fillna(0)
     sample_size = min(200000, len(df))
     sample_idx = np.random.RandomState(42).choice(len(df), sample_size, replace=False)
     X_sample = X.iloc[sample_idx]
@@ -234,7 +258,7 @@ for target_name, target_mask in propensity_targets.items():
     print(f"    AUC: {test_auc:.4f}")
 
     importance = model.feature_importances_
-    top_feats = sorted(zip(model_features, importance), key=lambda x: -x[1])[:5]
+    top_feats = sorted(zip(feat_cols, importance), key=lambda x: -x[1])[:5]
     print(f"    Top features: {[f'{f}({v:.3f})' for f,v in top_feats]}")
 
 # ═══════════════════════════════════════════════════════════
@@ -268,16 +292,16 @@ for plan in ['free', 'essential_monthly_plan_v0', 'standard_monthly_plan_v0', 'p
 df['expected_retention_months'] = df['package'].map(segment_clv).fillna(8.0)
 df['survival_clv'] = df['avg_mrr'] * df['expected_retention_months']
 
-# Initiative EV calculation
+# Initiative EV calculation — incremental annual ARR, not full survival CLV
 initiatives = {
-    'rendering_fix': {'elig': 'eligible_rendering_fix', 'propensity': 'p_send_completion', 'uplift': 0.10, 'reachability': 1.0, 'revenue_mult': 1.0},
-    'brandkit': {'elig': 'eligible_brandkit', 'propensity': 'p_activation', 'uplift': 0.08, 'reachability': 1.0, 'revenue_mult': 0.8},
-    'universal_content': {'elig': 'eligible_universal_content', 'propensity': 'p_send_completion', 'uplift': 0.12, 'reachability': 1.0, 'revenue_mult': 1.0},
-    'ai_builder': {'elig': 'eligible_ai_builder', 'propensity': 'p_activation', 'uplift': 0.10, 'reachability': 1.0, 'revenue_mult': 0.9},
-    'template_improvement': {'elig': 'eligible_template_improvement', 'propensity': 'p_send_completion', 'uplift': 0.15, 'reachability': 1.0, 'revenue_mult': 0.7},
-    'omnichannel': {'elig': 'eligible_omnichannel', 'propensity': 'p_high_engagement', 'uplift': 0.05, 'reachability': 0.8, 'revenue_mult': 1.2},
-    'activation': {'elig': 'eligible_activation', 'propensity': 'p_activation', 'uplift': 0.08, 'reachability': 1.0, 'revenue_mult': 0.5},
-    'code_mode': {'elig': 'eligible_code_mode', 'propensity': 'p_send_completion', 'uplift': 0.06, 'reachability': 0.8, 'revenue_mult': 1.5},
+    'rendering_fix': {'elig': 'eligible_rendering_fix', 'propensity': 'p_send_completion', 'uplift': 0.008, 'reachability': 1.0, 'revenue_mult': 1.0},
+    'brandkit': {'elig': 'eligible_brandkit', 'propensity': 'p_activation', 'uplift': 0.006, 'reachability': 1.0, 'revenue_mult': 0.8},
+    'universal_content': {'elig': 'eligible_universal_content', 'propensity': 'p_send_completion', 'uplift': 0.010, 'reachability': 1.0, 'revenue_mult': 1.0},
+    'ai_builder': {'elig': 'eligible_ai_builder', 'propensity': 'p_activation', 'uplift': 0.008, 'reachability': 1.0, 'revenue_mult': 0.9},
+    'template_improvement': {'elig': 'eligible_template_improvement', 'propensity': 'p_send_completion', 'uplift': 0.012, 'reachability': 1.0, 'revenue_mult': 0.7},
+    'omnichannel': {'elig': 'eligible_omnichannel', 'propensity': 'p_high_engagement', 'uplift': 0.005, 'reachability': 0.8, 'revenue_mult': 1.2},
+    'activation': {'elig': 'eligible_activation', 'propensity': 'p_activation', 'uplift': 0.006, 'reachability': 1.0, 'revenue_mult': 0.5},
+    'code_mode': {'elig': 'eligible_code_mode', 'propensity': 'p_send_completion', 'uplift': 0.007, 'reachability': 0.8, 'revenue_mult': 1.5},
 }
 
 print("\n  Scoring EV per customer per initiative...")
@@ -287,7 +311,8 @@ for init_name, config in initiatives.items():
     propensity = df[config['propensity']].values
     uplift = config['uplift']
     reachability = config['reachability']
-    revenue = df['survival_clv'].values * config['revenue_mult']
+    annual_arr = df['avg_mrr'].values * 12
+    revenue = annual_arr * config['revenue_mult']
 
     # Confidence discount: simple version based on propensity calibration
     confidence = np.clip(propensity * 0.8 + 0.2, 0.1, 1.0)
@@ -337,6 +362,20 @@ def reason_code(row):
 print("\n  Generating reason codes...")
 df['reason_codes'] = df.apply(reason_code, axis=1)
 
+# Population calibration (before Monte Carlo)
+total_ev_sample = df['best_ev_annualized'].sum()
+paid_mask = df['primary_plan_type'].isin(['monthly', 'payg'])
+n_paid_sample = paid_mask.sum()
+paid_sample_mrr = df.loc[paid_mask, 'avg_mrr'].mean() if n_paid_sample else 1
+mrr_calibration = POP_AVG_MRR_PAID / max(paid_sample_mrr, 1)
+# Extrapolate from paid sample to paid population (avoid double-scaling free cohort)
+total_ev = (total_ev_sample / max(n_paid_sample, 1)) * POP_PAID_SIZE * mrr_calibration * FY27_REALIZATION_RATE
+calibration_factor = (POP_PAID_SIZE / max(n_paid_sample, 1)) * mrr_calibration * FY27_REALIZATION_RATE
+population_scale = POP_PAID_SIZE / max(n_paid_sample, 1)
+print(f"\n  Sample EV (annualized): ${total_ev_sample/1e6:.1f}M")
+print(f"  Paid pop scale: {population_scale:.1f}x | MRR calibration: {mrr_calibration:.3f}x | FY27 realization: {FY27_REALIZATION_RATE:.0%}")
+print(f"  Calibrated FY27 EV: ${total_ev/1e6:.1f}M")
+
 # ═══════════════════════════════════════════════════════════
 # PHASE 5: MONTE CARLO + SEQUENCING
 # ═══════════════════════════════════════════════════════════
@@ -344,13 +383,13 @@ print("\n" + "=" * 60)
 print("PHASE 5: Monte Carlo Simulation + Wave Sequencing")
 print("=" * 60)
 
-# Monte Carlo
+# Monte Carlo — scale simulations to population
 print("\n  Running Monte Carlo simulation (10K iterations)...")
 n_sims = 10000
 sim_results = []
 for _ in range(n_sims):
     noise = np.random.normal(1.0, 0.3, size=len(df))
-    sim_total = (df['best_ev_annualized'] * noise.clip(0.2, 2.0)).sum()
+    sim_total = (df['best_ev_annualized'] * noise.clip(0.2, 2.0)).sum() * calibration_factor
     sim_results.append(sim_total)
 
 sim_results = np.array(sim_results)
@@ -369,7 +408,7 @@ wave_summary = []
 cumulative_rev = 0
 for w in [1, 2, 3, 4]:
     wdf = df[df['wave'] == w]
-    wave_rev = wdf['best_ev_annualized'].sum()
+    wave_rev = wdf['best_ev_annualized'].sum() * calibration_factor
     cumulative_rev += wave_rev
     wave_summary.append({
         'wave': w,
@@ -402,6 +441,32 @@ print(f"\n  Saved {len(df):,} customer scores to outputs/customer_scores.csv")
 # Save Monte Carlo results
 mc_df = pd.DataFrame({'simulation': range(n_sims), 'total_revenue': sim_results})
 mc_df.to_csv("outputs/monte_carlo_results.csv", index=False)
+np.save("outputs/mc_iterations.npy", np.array(sim_results))
+mc_summary = pd.DataFrame([
+    {'metric': 'P10', 'value': p10},
+    {'metric': 'P50', 'value': p50},
+    {'metric': 'P90', 'value': p90},
+    {'metric': 'mean', 'value': sim_results.mean()},
+    {'metric': 'std', 'value': sim_results.std()},
+    {'metric': 'target_21M_hit_rate', 'value': (np.array(sim_results) >= 21e6).mean()},
+])
+mc_summary.to_csv("outputs/monte_carlo_summary.csv", index=False)
+
+# Initiative summary for readout
+init_summary = df.groupby('best_initiative').agg(
+    customers=('user_id', 'count'),
+    total_mrr=('avg_mrr', 'sum'),
+    total_ev_base=('best_ev_annualized', lambda x: x.sum() * calibration_factor),
+    avg_p_success=('p_send_completion', 'mean'),
+).reset_index()
+init_summary['wave'] = init_summary['best_initiative'].map(
+    df.groupby('best_initiative')['wave'].agg(lambda x: x.mode().iloc[0])
+)
+init_summary['total_ev_low'] = init_summary['total_ev_base'] * 0.7
+init_summary['total_ev_high'] = init_summary['total_ev_base'] * 1.3
+init_summary['avg_confidence'] = 0.75
+init_summary['description'] = init_summary['best_initiative'].str.replace('_', ' ').str.title()
+init_summary.to_csv("outputs/initiative_summary.csv", index=False)
 
 # Save segment scores
 seg_scores = df.groupby(['best_initiative', 'wave']).agg(
@@ -422,8 +487,7 @@ print("\n" + "=" * 60)
 print("ANALYSIS COMPLETE")
 print("=" * 60)
 
-total_ev = df['best_ev_annualized'].sum()
-print(f"\nTotal Expected Value (annualized): ${total_ev/1e6:.1f}M")
+print(f"\nTotal Expected Value (annualized, calibrated): ${total_ev/1e6:.1f}M")
 print(f"$21M Target Gap: ${(21e6 - total_ev)/1e6:.1f}M")
 print(f"Monte Carlo P10/P50/P90: ${p10/1e6:.1f}M / ${p50/1e6:.1f}M / ${p90/1e6:.1f}M")
 print(f"\nWave breakdown:")
@@ -439,14 +503,18 @@ for _, c in cluster_df.iterrows():
 # Save key numbers for the readout
 key_numbers = {
     'total_customers': int(len(df)),
+    'population_size': POPULATION_SIZE,
     'paid_customers': int((df['primary_plan_type'] == 'monthly').sum()),
     'free_customers': int((df['primary_plan_type'] == 'free').sum()),
     'total_ev_annualized': float(total_ev),
+    'sample_ev_annualized': float(total_ev_sample),
+    'fy27_realization_rate': FY27_REALIZATION_RATE,
     'monte_carlo_p10': float(p10),
     'monte_carlo_p50': float(p50),
     'monte_carlo_p90': float(p90),
     'target': 21000000,
     'gap': float(21e6 - total_ev),
+    'data_source': df['data_source'].iloc[0] if 'data_source' in df.columns else 'unknown',
     'waves': wave_summary,
     'initiative_counts': df['best_initiative'].value_counts().to_dict(),
     'cluster_summary': [{

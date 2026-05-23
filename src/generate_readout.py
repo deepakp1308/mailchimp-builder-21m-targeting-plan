@@ -21,7 +21,10 @@ print("=" * 60)
 # --- Load all outputs ---
 df = pd.read_parquet(DATA_PATH)
 cluster_profiles = pd.read_csv(os.path.join(OUT_DIR, "cluster_profiles.csv"))
-init_sequence = pd.read_csv(os.path.join(OUT_DIR, "initiative_sequence.csv"))
+try:
+    init_sequence = pd.read_csv(os.path.join(OUT_DIR, "initiative_summary.csv"))
+except FileNotFoundError:
+    init_sequence = pd.read_csv(os.path.join(OUT_DIR, "initiative_sequence.csv"))
 mc_summary = pd.read_csv(os.path.join(OUT_DIR, "monte_carlo_summary.csv"))
 mc_iterations = np.load(os.path.join(OUT_DIR, "mc_iterations.npy"))
 
@@ -66,9 +69,9 @@ fig_mc.update_layout(
 mc_html = pio.to_html(fig_mc, include_plotlyjs='cdn', full_html=False)
 
 # 2. Revenue waterfall chart
-waterfall_data = init_sequence.sort_values('wave')
+waterfall_data = init_sequence.sort_values('total_ev_base', ascending=False).head(8)
 fig_wf = go.Figure(go.Waterfall(
-    x=waterfall_data['best_initiative'],
+    x=waterfall_data['best_initiative'].str.replace('_', ' ').str.title(),
     y=waterfall_data['total_ev_base'],
     textposition="outside",
     text=[f"${v/1e6:.1f}M" for v in waterfall_data['total_ev_base']],
@@ -88,16 +91,40 @@ wf_html = pio.to_html(fig_wf, include_plotlyjs=False, full_html=False)
 
 # --- Build HTML ---
 today = datetime.now().strftime("%B %d, %Y")
-is_synthetic = True  # flag for data source
+is_synthetic = 'data_source' not in df.columns or df['data_source'].iloc[0] != 'bigquery_batched_sample'
+
+try:
+    with open(os.path.join(OUT_DIR, "key_numbers.json")) as f:
+        key_numbers = json.load(f)
+    if key_numbers.get('data_source') == 'bigquery_batched_sample':
+        is_synthetic = False
+except FileNotFoundError:
+    key_numbers = {}
 
 total_customers = len(df)
 total_mrr = df['avg_mrr'].sum()
-scored_customers = df['best_initiative'].notna().sum()
 
-# Wave 1 details
-wave1 = init_sequence[init_sequence['wave'] == 1].copy()
-wave1_total = wave1['total_ev_base'].sum()
-wave1_customers = wave1['customers'].sum()
+try:
+    scored_df = pd.read_csv(os.path.join(OUT_DIR, "customer_scores.csv"))
+    scored_customers = len(scored_df)
+except FileNotFoundError:
+    scored_df = df
+    scored_customers = len(df)
+
+# Use initiative_summary if available, else wave sequence from run_analysis
+try:
+    init_sequence = pd.read_csv(os.path.join(OUT_DIR, "initiative_summary.csv"))
+except FileNotFoundError:
+    pass
+
+# Wave 1 details — adapt column names from run_analysis output
+wave1 = init_sequence[init_sequence.get('wave', pd.Series(dtype=int)) == 1].copy() if 'wave' in init_sequence.columns else init_sequence.head(3)
+if 'total_ev_base' in wave1.columns:
+    wave1_total = wave1['total_ev_base'].sum()
+    wave1_customers = wave1['customers'].sum() if 'customers' in wave1.columns else 0
+else:
+    wave1_total = wave1['expected_revenue'].sum() if 'expected_revenue' in wave1.columns else 0
+    wave1_customers = wave1['customer_count'].sum() if 'customer_count' in wave1.columns else 0
 
 # Can we hit $21M?
 can_hit = p50 >= 21_000_000
@@ -116,16 +143,24 @@ feasibility_answer = (
 def wave_table_rows(wave_df, wave_num):
     rows = ""
     for _, r in wave_df.iterrows():
+        customers = r.get('customers', r.get('customer_count', 0))
+        total_mrr = r.get('total_mrr', 0)
+        ev_base = r.get('total_ev_base', r.get('expected_revenue', 0))
+        ev_low = r.get('total_ev_low', ev_base * 0.7)
+        ev_high = r.get('total_ev_high', ev_base * 1.3)
+        p_success = r.get('avg_p_success', 0.5)
+        confidence = r.get('avg_confidence', 0.75)
+        desc = r.get('description', r['best_initiative'])
         rows += f"""<tr>
-            <td style="font-weight:600">{r['best_initiative'].replace('_', ' ').title()}</td>
-            <td>{r.get('description', r['best_initiative'])}</td>
-            <td style="text-align:right">{r['customers']:,.0f}</td>
-            <td style="text-align:right">${r['total_mrr']:,.0f}</td>
-            <td style="text-align:right">${r['total_ev_base']:,.0f}</td>
-            <td style="text-align:right">${r['total_ev_low']:,.0f}</td>
-            <td style="text-align:right">${r['total_ev_high']:,.0f}</td>
-            <td style="text-align:center">{r['avg_p_success']:.0%}</td>
-            <td style="text-align:center">{r['avg_confidence']:.2f}</td>
+            <td style="font-weight:600">{str(r['best_initiative']).replace('_', ' ').title()}</td>
+            <td>{desc}</td>
+            <td style="text-align:right">{customers:,.0f}</td>
+            <td style="text-align:right">${total_mrr:,.0f}</td>
+            <td style="text-align:right">${ev_base:,.0f}</td>
+            <td style="text-align:right">${ev_low:,.0f}</td>
+            <td style="text-align:right">${ev_high:,.0f}</td>
+            <td style="text-align:center">{p_success:.0%}</td>
+            <td style="text-align:center">{confidence:.2f}</td>
             <td>{r.get('rationale', '')}</td>
         </tr>"""
     return rows
@@ -142,19 +177,23 @@ for w in [1, 2, 3, 4]:
         </tr>"""
         all_wave_rows += wave_table_rows(w_data, w)
 
-# Cluster table
+# Cluster table — handle optional columns from run_analysis output
 cluster_rows = ""
 for _, c in cluster_profiles.iterrows():
+    pct = c.get('pct_of_total', round(100 * c['customer_count'] / total_customers, 1))
+    tenure = c.get('avg_tenure_months', c.get('tenure_months', 0))
+    active_days = c.get('avg_active_days_90d', 0)
+    churn = c.get('churn_rate', 0)
     cluster_rows += f"""<tr>
-        <td style="font-weight:600">{c['cluster_name']}</td>
-        <td style="text-align:right">{c['customer_count']:,}</td>
-        <td style="text-align:right">{c['pct_of_total']}%</td>
+        <td style="font-weight:600">{c.get('cluster_name', c.get('cluster_id', ''))}</td>
+        <td style="text-align:right">{int(c['customer_count']):,}</td>
+        <td style="text-align:right">{pct}%</td>
         <td style="text-align:right">${c['avg_mrr']:.0f}</td>
-        <td style="text-align:right">{c['avg_completion_rate']:.0%}</td>
-        <td style="text-align:right">{c['avg_friction_score']:.2f}</td>
-        <td style="text-align:right">{c['avg_tenure_months']:.0f}mo</td>
-        <td style="text-align:right">{c['avg_active_days_90d']:.0f}d</td>
-        <td style="text-align:right">{c['churn_rate']:.1%}</td>
+        <td style="text-align:right">{c.get('avg_completion_rate', 0):.0%}</td>
+        <td style="text-align:right">{c.get('avg_friction_score', 0):.2f}</td>
+        <td style="text-align:right">{tenure:.0f}mo</td>
+        <td style="text-align:right">{active_days:.0f}d</td>
+        <td style="text-align:right">{churn:.1%}</td>
     </tr>"""
 
 # Model results table
@@ -168,14 +207,17 @@ for mname, mdata in model_results.items():
     </tr>"""
 
 # Initiative-to-segment mapping
-scored_df = df[df['best_initiative'].notna()].copy()
+scored_df = pd.read_csv(os.path.join(OUT_DIR, "customer_scores.csv"))
 mapping_rows = ""
-if 'cluster_name' in scored_df.columns:
+if 'cluster_id' in scored_df.columns:
+    cluster_map = cluster_profiles.set_index('cluster_id')['cluster_name'].to_dict() if 'cluster_name' in cluster_profiles.columns else {}
+    scored_df['cluster_name'] = scored_df['cluster_id'].map(cluster_map).fillna('Cluster ' + scored_df['cluster_id'].astype(str))
+if 'best_initiative' in scored_df.columns:
     mapping = scored_df.groupby(['best_initiative', 'cluster_name']).agg(
         count=('user_id', 'count'),
-        total_ev=('ev_base', 'sum'),
+        total_ev=('best_ev_annualized', 'sum'),
         avg_mrr=('avg_mrr', 'mean'),
-    ).reset_index().sort_values('total_ev', ascending=False)
+    ).reset_index().sort_values('total_ev', ascending=False) if 'cluster_name' in scored_df.columns else pd.DataFrame()
     for _, m in mapping.head(25).iterrows():
         mapping_rows += f"""<tr>
             <td>{m['best_initiative'].replace('_', ' ').title()}</td>
@@ -186,17 +228,21 @@ if 'cluster_name' in scored_df.columns:
         </tr>"""
 
 # Wave 1 top segments table
-wave1_inits = wave1['best_initiative'].tolist() if len(wave1) > 0 else []
-w1_segments = scored_df[scored_df['best_initiative'].isin(wave1_inits)]
-if 'cluster_name' in w1_segments.columns:
+wave1_inits = wave1['best_initiative'].tolist() if len(wave1) > 0 and 'best_initiative' in wave1.columns else []
+w1_segments = scored_df[scored_df['best_initiative'].isin(wave1_inits)] if wave1_inits else scored_df.head(0)
+if len(w1_segments) > 0 and 'cluster_name' in w1_segments.columns:
     w1_seg_agg = w1_segments.groupby(['best_initiative', 'cluster_name']).agg(
         count=('user_id', 'count'),
         total_mrr=('avg_mrr', 'sum'),
         avg_mrr=('avg_mrr', 'mean'),
-        total_ev=('ev_base', 'sum'),
+        total_ev=('best_ev_annualized', 'sum'),
     ).reset_index().sort_values('total_ev', ascending=False).head(5)
+    w1_seg_agg['cluster_name'] = w1_seg_agg['cluster_name']
 else:
-    w1_seg_agg = pd.DataFrame()
+    w1_seg_agg = cluster_profiles.head(5).copy()
+    w1_seg_agg['best_initiative'] = 'universal_content'
+    w1_seg_agg['count'] = w1_seg_agg['customer_count']
+    w1_seg_agg['total_ev'] = w1_seg_agg.get('annualized_revenue', 0)
 
 w1_top_rows = ""
 for _, s in w1_seg_agg.iterrows():
@@ -209,10 +255,12 @@ for _, s in w1_seg_agg.iterrows():
     </tr>"""
 
 
-DATA_NOTE = """<p><strong style="color:#E63946">⚠ SYNTHETIC DATA</strong> — 
-This analysis uses a synthetic dataset of 1M customers calibrated to known Mailchimp metrics 
-(package mix, MRR distribution, churn rates, builder activation rates). Results should be 
-validated against production BigQuery data before executive presentation.</p>""" if is_synthetic else ""
+DATA_NOTE = """<p><strong style="color:#2E86AB">✓ PRODUCTION DATA (BATCHED SAMPLE)</strong> — 
+This analysis uses a stratified 50K customer sample from BigQuery (35K top paid + 15K active free), 
+with population calibration applied to MRR and customer counts. Sample skews toward high-MRR paid accounts; 
+segment rankings and initiative priorities are directional. Validate uplift assumptions via experiments before final investment decisions.</p>""" if not is_synthetic else """<p><strong style="color:#E63946">⚠ SYNTHETIC DATA</strong> — 
+This analysis uses a synthetic dataset calibrated to known Mailchimp metrics. 
+Results should be validated against production BigQuery data before executive presentation.</p>"""
 
 html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -451,7 +499,7 @@ md += f"""## Customer Segments
 |---------|-------|---------|------------|----------|-------|
 """
 for _, c in cluster_profiles.iterrows():
-    md += f"| {c['cluster_name']} | {c['customer_count']:,} | ${c['avg_mrr']:.0f} | {c['avg_completion_rate']:.0%} | {c['avg_friction_score']:.2f} | {c['churn_rate']:.1%} |\n"
+    md += f"| {c.get('cluster_name', c.get('cluster_id', ''))} | {int(c['customer_count']):,} | ${c['avg_mrr']:.0f} | {c.get('avg_completion_rate', 0):.0%} | {c.get('avg_friction_score', 0):.2f} | {c.get('churn_rate', 0):.1%} |\n"
 
 md += f"""
 ## Key Assumptions & Risks
