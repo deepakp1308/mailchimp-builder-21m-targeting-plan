@@ -1,0 +1,27 @@
+{
+  "completion": {
+    "auc": 1.0,
+    "positive_rate": 0.4128,
+    "status": "trained"
+  },
+  "upgrade": {
+    "auc": 0.4993,
+    "positive_rate": 0.1197,
+    "status": "trained"
+  },
+  "churn": {
+    "auc": 0.4951,
+    "positive_rate": 0.0422,
+    "status": "trained"
+  },
+  "activation": {
+    "auc": 1.0,
+    "positive_rate": 0.5745,
+    "status": "trained"
+  },
+  "free_to_paid": {
+    "auc": 0.5,
+    "status": "skipped",
+    "positive_rate": 0.0
+  }
+}
